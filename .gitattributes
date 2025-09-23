@@ -1,0 +1,77 @@
+# nMapping+ Git Attributes Configuration
+
+# Set default behavior for line endings
+* text=auto
+
+# Ensure shell scripts have Unix line endings
+*.sh text eol=lf
+
+# Ensure Python files have consistent line endings
+*.py text eol=lf
+
+# Ensure web files have consistent line endings
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+
+# Ensure documentation has consistent line endings
+*.md text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Mark binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# Language detection overrides
+*.sh linguist-language=Shell
+*.py linguist-language=Python
+*.html linguist-language=HTML
+*.css linguist-language=CSS
+*.js linguist-language=JavaScript
+*.md linguist-language=Markdown
+
+# Exclude files from language statistics
+.github/* linguist-documentation
+docs/* linguist-documentation
+*.md linguist-documentation
+
+# Mark scripts as executable (for systems that support it)
+scripts/*.sh diff=bash
+scripts/*.sh merge=union
+
+# Sensitive files that should not be diffed in detail
+*.key binary
+*.pem binary
+*.crt binary
+config/secrets.yml binary
+*.env binary
+
+# Large files that should use Git LFS (if enabled)
+# *.db filter=lfs diff=lfs merge=lfs -text
+# *.sqlite3 filter=lfs diff=lfs merge=lfs -text
+# *.log filter=lfs diff=lfs merge=lfs -text
+
+# Merge strategies for specific files
+CHANGELOG.md merge=union
+CONTRIBUTING.md merge=union
+README.md merge=union
+
+# Export ignore (files not included in git archive)
+.gitignore export-ignore
+.gitattributes export-ignore
+.github/ export-ignore
+tests/ export-ignore
+*.log export-ignore
+*.tmp export-ignore
