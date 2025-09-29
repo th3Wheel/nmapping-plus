@@ -5,6 +5,7 @@ Get your nMapping+ network monitoring system up and running in under 30 minutes!
 ## 🚀 Prerequisites
 
 Before starting, ensure you have:
+
 - Proxmox VE 7.0+ host with root access
 - 4GB RAM and 20GB storage available
 - Internet connectivity for downloads
@@ -21,7 +22,7 @@ On your Proxmox VE host:
 mkdir -p /root/nmapping-plus && cd /root/nmapping-plus
 
 # Download nMapping+ package
-wget https://github.com/your-repo/nmapping-plus/archive/main.zip
+wget https://github.com/th3Wheel/nmapping-plus/archive/main.zip
 unzip main.zip && cd nmapping-plus-main
 
 # Make scripts executable
@@ -85,7 +86,7 @@ bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/c
 # Install scanner components
 pct exec 201 -- bash -c "
     apt update && apt install -y wget curl
-    wget -qLO - https://raw.githubusercontent.com/your-repo/nmapping-plus/main/scripts/install_nmap_fingplus.sh | bash
+    wget -qLO - https://raw.githubusercontent.com/th3Wheel/nmapping-plus/main/scripts/install_nmap_fingplus.sh | bash
 "
 ```
 
@@ -104,7 +105,7 @@ bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/c
 # Install dashboard components
 pct exec 202 -- bash -c "
     apt update && apt install -y wget curl
-    wget -qLO - https://raw.githubusercontent.com/your-repo/nmapping-plus/main/scripts/install_dashboard_enhanced.sh | bash
+    wget -qLO - https://raw.githubusercontent.com/th3Wheel/nmapping-plus/main/scripts/install_dashboard_enhanced.sh | bash
 "
 ```
 
@@ -249,6 +250,7 @@ curl -s http://$DASHBOARD_IP/api/devices | jq length
 ### Common Issues
 
 #### Scanner not finding devices
+
 ```bash
 # Check network connectivity
 pct exec 201 -- ping 8.8.8.8
@@ -259,6 +261,7 @@ pct exec 201 -- nmap --version
 ```
 
 #### Dashboard not accessible
+
 ```bash
 # Check nginx status
 pct exec 202 -- systemctl status nginx
@@ -271,6 +274,7 @@ pct exec 202 -- curl -s http://localhost/api/health
 ```
 
 #### Git sync failing
+
 ```bash
 # Test SSH connectivity
 SCANNER_IP=$(pct exec 201 -- hostname -I | awk '{print $1}')
@@ -287,7 +291,7 @@ If you encounter issues:
 1. **Check logs**: Use the log commands above to identify errors
 2. **Verify networking**: Ensure containers can communicate
 3. **Review documentation**: See [[deployment-guide|Deployment Guide]] for detailed instructions
-4. **Community support**: Visit [GitHub Discussions](https://github.com/your-repo/nmapping-plus/discussions)
+4. **Community support**: Visit [GitHub Discussions](https://github.com/th3Wheel/nmapping-plus/discussions)
 
 ## 🎉 Next Steps
 
@@ -302,9 +306,10 @@ Now that nMapping+ is running:
 ## 📚 Learn More
 
 - **[[deployment-guide|Full Deployment Guide]]** - Comprehensive setup instructions
-- **[Configuration Guide](configuration/)** - Detailed customization options  
-- **[API Reference](reference/api.md)** - Complete API documentation
-- **[Troubleshooting](operations/troubleshooting.md)** - Detailed problem resolution
+<!-- The following links are provided for future documentation expansion. Uncomment or update when these files/folders exist. -->
+- <!-- **[Configuration Guide](configuration/)** - Detailed customization options  -->
+- <!-- **[API Reference](reference/api.md)** - Complete API documentation -->
+- <!-- **[Troubleshooting](operations/troubleshooting.md)** - Detailed problem resolution -->
 
 ---
 

@@ -1,4 +1,5 @@
-# nMapping+ 
+# nMapping+
+
 ## Self-hosted Network Mapping with Real-time Web Dashboard
 
 A comprehensive, zero-cost network monitoring solution that combines Nmap scanning, Git-based change tracking, and a modern web dashboard for real-time network visibility. Built on **Proxmox VE Community Scripts** for reliable LXC deployment.
@@ -168,16 +169,19 @@ graph TB
 ### Resource Requirements
 
 **Minimum (Small Network < 50 devices):**
+
 - CPU: 1 vCPU
 - RAM: 512MB
 - Storage: 2GB
 
 **Recommended (Medium Network < 500 devices):**
+
 - CPU: 2 vCPU  
 - RAM: 1GB
 - Storage: 5GB
 
 **Enterprise (Large Network 1000+ devices):**
+
 - CPU: 4 vCPU
 - RAM: 2GB
 - Storage: 10GB

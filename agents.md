@@ -21,6 +21,7 @@ The nMapping+ Agents framework provides intelligent automation capabilities for 
 ### What are nMapping+ Agents?
 
 Agents are autonomous software components that:
+
 - **Monitor** network conditions continuously
 - **Analyze** patterns and anomalies using AI/ML
 - **Respond** to events with predefined or learned actions
@@ -221,12 +222,14 @@ integration:
 **Purpose**: Detect unusual network behavior using machine learning
 
 **Features**:
+
 - Isolation Forest for outlier detection
 - Time-series analysis for traffic patterns
 - Device behavior profiling
 - Automated threshold adjustment
 
 **Configuration**:
+
 ```yaml
 anomaly_detection:
   model_type: "isolation_forest"  # isolation_forest, one_class_svm, autoencoder
@@ -240,6 +243,7 @@ anomaly_detection:
 ```
 
 **Usage**:
+
 ```python
 from agents.detection.anomaly import AnomalyDetectionAgent
 
@@ -254,12 +258,14 @@ agent.update_model()  # Incremental learning
 **Purpose**: Integrate external threat feeds and IOCs
 
 **Features**:
+
 - Multiple threat feed integration
 - IP/domain reputation checking
 - Automated IOC enrichment
 - Custom threat feed support
 
 **Configuration**:
+
 ```yaml
 threat_intelligence:
   feeds:
@@ -287,12 +293,14 @@ threat_intelligence:
 **Purpose**: Automated response to security events
 
 **Features**:
+
 - Rule-based response actions
 - Approval workflows for critical actions
 - Integration with network devices
 - Rollback capabilities
 
 **Configuration**:
+
 ```yaml
 auto_remediation:
   rules:
@@ -321,6 +329,7 @@ auto_remediation:
 **Purpose**: Forward events and data to SIEM platforms
 
 **Supported Platforms**:
+
 - Splunk
 - IBM QRadar
 - ArcSight
@@ -329,6 +338,7 @@ auto_remediation:
 - Azure Sentinel
 
 **Configuration**:
+
 ```yaml
 siem_integration:
   splunk:
@@ -575,6 +585,7 @@ performance:
 ### Common Issues
 
 **Agent Not Starting**
+
 ```bash
 # Check agent logs
 tail -f logs/agent_manager.log
@@ -587,6 +598,7 @@ python agents/test_agent.py --agent anomaly_detection
 ```
 
 **High Memory Usage**
+
 ```yaml
 # Reduce memory usage in config
 performance:
@@ -596,6 +608,7 @@ performance:
 ```
 
 **Agent Communication Issues**
+
 ```bash
 # Check Redis connection
 redis-cli ping
@@ -624,6 +637,7 @@ Access the agent status dashboard at:
 `http://your-dashboard-host:5000/agents`
 
 Features:
+
 - Real-time agent status
 - Performance metrics
 - Event processing stats
@@ -659,6 +673,7 @@ Features:
 ### Professional Support
 
 For enterprise deployments and custom agent development:
+
 - **Consulting**: Custom agent development and integration
 - **Training**: Agent framework workshops and certification
 - **Support**: Priority support for production deployments

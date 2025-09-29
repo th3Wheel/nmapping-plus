@@ -189,9 +189,9 @@ nMapping+ is released under the MIT License, ensuring:
 ### 🔗 Resources
 
 - **Documentation**: [[index|/docs/index.md]]
-- **GitHub Repository**: https://github.com/your-repo/nmapping-plus
-- **Community Forum**: https://github.com/your-repo/nmapping-plus/discussions
-- **Bug Reports**: https://github.com/your-repo/nmapping-plus/issues
+- **GitHub Repository**: https://github.com/th3Wheel/nmapping-plus
+- **Community Forum**: https://github.com/th3Wheel/nmapping-plus/discussions
+- **Bug Reports**: https://github.com/th3Wheel/nmapping-plus/issues
 - **Security Issues**: security@nmapping-plus.org
 
 ---
@@ -219,7 +219,7 @@ nMapping+ is released under the MIT License, ensuring:
 *This changelog follows the principles of keeping a changelog and semantic versioning. For the most up-to-date information, visit our GitHub repository.*
 
 <!-- Version Links -->
-[Unreleased]: https://github.com/your-repo/nmapping-plus/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/your-repo/nmapping-plus/releases/tag/v1.0.0
-[1.0.1]: https://github.com/your-repo/nmapping-plus/compare/v1.0.0...v1.0.1
-[1.1.0]: https://github.com/your-repo/nmapping-plus/compare/v1.0.0...v1.1.0
+[Unreleased]: https://github.com/th3Wheel/nmapping-plus/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/th3Wheel/nmapping-plus/releases/tag/v1.0.0
+[1.0.1]: https://github.com/th3Wheel/nmapping-plus/compare/v1.0.0...v1.0.1
+[1.1.0]: https://github.com/th3Wheel/nmapping-plus/compare/v1.0.0...v1.1.0

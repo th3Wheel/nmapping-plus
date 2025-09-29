@@ -52,6 +52,7 @@ graph TB
 ## Prerequisites
 
 ### System Requirements
+
 - **Proxmox VE**: Version 8.0 or higher
 - **RAM**: Minimum 4GB available for containers
 - **Storage**: 20GB available space
@@ -59,6 +60,7 @@ graph TB
 - **CPU**: 4+ cores recommended for optimal performance
 
 ### Network Requirements
+
 - Scanner container needs access to target networks
 - Dashboard container needs web access from management network
 - Git communication between containers
@@ -75,8 +77,9 @@ On your Proxmox VE host, download the nMapping+ deployment tools:
 mkdir -p /root/nmapping-plus
 cd /root/nmapping-plus
 
+
 # Download the complete nMapping+ package
-wget https://github.com/your-repo/nmapping-plus/archive/main.zip
+wget https://github.com/th3Wheel/nmapping-plus/archive/main.zip
 unzip main.zip
 cd nmapping-plus-main
 
@@ -121,6 +124,7 @@ After container creation, run the post-deployment setup:
 nMapping+ leverages battle-tested Proxmox VE Community Scripts for reliable container deployment:
 
 #### Why Community Scripts?
+
 - **300+ proven installation scripts** tested by the community
 - **Optimized container configurations** for different use cases
 - **Regular security updates** and maintenance
@@ -128,6 +132,7 @@ nMapping+ leverages battle-tested Proxmox VE Community Scripts for reliable cont
 - **Active community support** and documentation
 
 #### Scanner Container (LXC 201)
+
 ```bash
 # Create scanner container using community Debian script
 bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/debian.sh)"
@@ -145,6 +150,7 @@ bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/c
 ```
 
 #### Dashboard Container (LXC 202)
+
 ```bash
 # Create dashboard container using community Debian script
 bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/debian.sh)"
@@ -169,9 +175,10 @@ Install and configure the nMapping+ scanner components:
 # Enter scanner container
 pct exec 201 -- bash
 
+
 # Download and run scanner installation script
 cd /tmp
-wget https://raw.githubusercontent.com/your-repo/nmapping-plus/main/scripts/install_nmap_fingplus.sh
+wget https://raw.githubusercontent.com/th3Wheel/nmapping-plus/main/scripts/install_nmap_fingplus.sh
 chmod +x install_nmap_fingplus.sh
 ./install_nmap_fingplus.sh
 
@@ -179,7 +186,8 @@ chmod +x install_nmap_fingplus.sh
 nano /nmap/config/targets.conf
 ```
 
-#### Scanner Features Installed:
+#### Scanner Features Installed
+
 - **Nmap**: Advanced network discovery and port scanning
 - **Masscan**: High-speed port scanner for large networks
 - **Python Scripts**: Custom fingerprinting and vulnerability detection
@@ -195,9 +203,10 @@ Install and configure the enhanced web dashboard:
 # Enter dashboard container
 pct exec 202 -- bash
 
+
 # Download and run enhanced dashboard installation
 cd /tmp
-wget https://raw.githubusercontent.com/your-repo/nmapping-plus/main/scripts/install_dashboard_enhanced.sh
+wget https://raw.githubusercontent.com/th3Wheel/nmapping-plus/main/scripts/install_dashboard_enhanced.sh
 chmod +x install_dashboard_enhanced.sh
 ./install_dashboard_enhanced.sh
 
@@ -207,7 +216,8 @@ chmod +x install_dashboard_enhanced.sh
 # - Email notification settings (optional)
 ```
 
-#### Dashboard Features Installed:
+#### Dashboard Features Installed
+
 - **Flask Web Application**: Real-time network monitoring interface
 - **WebSocket Integration**: Live updates without page refresh
 - **SQLite Database**: Optimized for fast queries and analytics
@@ -379,6 +389,7 @@ pct exec 202 -- sqlite3 /dashboard/data/dashboard.db ".backup '/tmp/dashboard-ba
 ### Common Issues and Solutions
 
 #### Scanner Container Issues
+
 ```bash
 # Check scanner service status
 pct exec 201 -- systemctl status nmapping-scanner
@@ -392,6 +403,7 @@ pct exec 201 -- nmap -sn 192.168.1.1
 ```
 
 #### Dashboard Container Issues
+
 ```bash
 # Check dashboard service status
 pct exec 202 -- systemctl status nmapping-dashboard
@@ -407,6 +419,7 @@ pct exec 202 -- netstat -tuln | grep 5000
 ```
 
 #### Git Synchronization Issues
+
 ```bash
 # Test Git connectivity
 pct exec 202 -- sudo -u nmapping git ls-remote scanner-ip:/nmap/registry
@@ -421,6 +434,7 @@ pct exec 201 -- sudo -u scanner git fsck
 ### Performance Optimization
 
 #### Scanner Performance
+
 ```bash
 # Optimize Nmap scanning performance
 pct exec 201 -- nano /nmap/config/scan_optimization.conf
@@ -433,6 +447,7 @@ pct set 201 -memory 2048
 ```
 
 #### Dashboard Performance
+
 ```bash
 # Optimize SQLite database
 pct exec 202 -- sudo -u nmapping sqlite3 /dashboard/data/dashboard.db "PRAGMA optimize;"
@@ -471,6 +486,7 @@ curl -X GET http://dashboard-ip/api/health
 ### Third-party Integrations
 
 #### SIEM Integration
+
 ```bash
 # Configure syslog forwarding
 pct exec 202 -- nano /etc/rsyslog.d/nmapping.conf
@@ -480,6 +496,7 @@ echo "*.info @siem-server:514" >> /etc/rsyslog.d/nmapping.conf
 ```
 
 #### Monitoring Integration
+
 ```bash
 # Prometheus metrics endpoint
 curl http://dashboard-ip/metrics
@@ -564,10 +581,11 @@ This comprehensive deployment guide provides everything needed to successfully d
 - **Easy Maintenance**: Automated updates and comprehensive logging
 
 For additional support and community resources:
-- 📖 **Documentation**: [GitHub Repository](https://github.com/your-repo/nmapping-plus)
-- 💬 **Community**: [Discussion Forum](https://github.com/your-repo/nmapping-plus/discussions)
-- 🐛 **Issues**: [Bug Reports](https://github.com/your-repo/nmapping-plus/issues)
-- 🚀 **Updates**: [Release Notes](https://github.com/your-repo/nmapping-plus/releases)
+
+- 📖 **Documentation**: [GitHub Repository](https://github.com/th3Wheel/nmapping-plus)
+- 💬 **Community**: [Discussion Forum](https://github.com/th3Wheel/nmapping-plus/discussions)
+- 🐛 **Issues**: [Bug Reports](https://github.com/th3Wheel/nmapping-plus/issues)
+- 🚀 **Updates**: [Release Notes](https://github.com/th3Wheel/nmapping-plus/releases)
 
 ---
 
