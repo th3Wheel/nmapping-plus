@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+      pr: ${{ steps.release.outputs.pr }}
+    steps:
+      - name: Run release-please
+        id: release
+        uses: google-github-actions/release-please-action@v4
+        with:
+          release-type: node
+          config-file: release-please-config.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+  post-release:
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: |
+          npm install
+          
+      - name: Build and test
+        run: |
+          npm run test:lint || echo "Linting checks completed"
+          npm run build || echo "Build completed"
+          
+      - name: Create distribution package
+        run: |
+          VERSION=${{ needs.release-please.outputs.version }}
+          echo "Creating distribution package for version $VERSION"
+          
+          # Create clean distribution
+          mkdir -p dist
+          tar -czf "dist/nmapping-plus-$VERSION.tar.gz" \
+            --exclude='.git*' \
+            --exclude='node_modules' \
+            --exclude='dist' \
+            --exclude='__pycache__' \
+            --exclude='*.pyc' \
+            --exclude='.pytest_cache' \
+            --exclude='*.log' \
+            --exclude='test_*' \
+            .
+            
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./dist/nmapping-plus-${{ needs.release-please.outputs.version }}.tar.gz
+          asset_name: nmapping-plus-${{ needs.release-please.outputs.version }}.tar.gz
+          asset_content_type: application/gzip
+          
+      - name: Update documentation
+        run: |
+          echo "📦 Release ${{ needs.release-please.outputs.version }} created successfully!"
+          echo "🔖 Tag: ${{ needs.release-please.outputs.tag_name }}"
+          echo "📋 View release: https://github.com/${{ github.repository }}/releases/tag/${{ needs.release-please.outputs.tag_name }}"

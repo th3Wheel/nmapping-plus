@@ -2,6 +2,8 @@
 
 Welcome to the comprehensive documentation for **nMapping+**, a self-hosted network mapping solution with real-time web dashboard built on Proxmox VE Community Scripts foundation.
 
+**Current Version: 0.1.0** | **Development Phase: Foundation**
+
 ## 📚 Documentation Structure
 
 ### 🚀 Getting Started
@@ -9,29 +11,30 @@ Welcome to the comprehensive documentation for **nMapping+**, a self-hosted netw
 - **[[deployment-guide|Deployment Guide]]** - Complete deployment instructions using Proxmox VE Community Scripts
 - **[[quick-start|Quick Start]]** - Minimal setup for testing and evaluation
 - **[[requirements|Installation Requirements]]** - System prerequisites and compatibility
+- **[[semantic-versioning|Semantic Versioning Guide]]** - Version management and release procedures
 
 ### 🏗️ Architecture
 
-- **[System Architecture](architecture/overview.md)** - High-level system design and components
-- **[Container Architecture](architecture/containers.md)** - LXC container design and communication
-- **[Database Schema](architecture/database.md)** - SQLite database structure and optimization
-- **[API Specification](architecture/api.md)** - RESTful API endpoints and WebSocket interface
+- **[[overview|System Architecture]]** - High-level system design and components
+- **[[containers|Container Architecture]]** - LXC container design and communication
+- **[[database|Database Schema]]** - SQLite database structure and optimization
+- **[[api|API Specification]]** - RESTful API endpoints and WebSocket interface
 <!-- If any architecture/*.md files are missing, create or update as needed. -->
 
 ### 🔧 Configuration
 
-- **[Scanner Configuration](configuration/scanner.md)** - Network scanning setup and customization
-- **[Dashboard Configuration](configuration/dashboard.md)** - Web interface customization and features
-- **[Git Synchronization](configuration/git-sync.md)** - Data synchronization between containers
-- **[Security Configuration](configuration/security.md)** - Hardening and access control
+- **[[scanner|Scanner Configuration]]** - Network scanning setup and customization
+- **[[dashboard|Dashboard Configuration]]** - Web interface customization and features
+- **[[git-sync|Git Synchronization]]** - Data synchronization between containers
+- **[[nMapping+/docs/configuration/security|Security Configuration]]** - Hardening and access control
 <!-- If any configuration/*.md files are missing, create or update as needed. -->
 
 ### 📋 Operations
 
-- **[Monitoring Guide](operations/monitoring.md)** - System monitoring and alerting
-- **[Backup and Recovery](operations/backup.md)** - Data protection strategies
+- **[[monitoring|Monitoring Guide]]** - System monitoring and alerting
+- **[[backup|Backup and Recovery]]** - Data protection strategies
 - **[Maintenance Tasks](operations/maintenance.md)** - Regular maintenance procedures
-- **[Troubleshooting](operations/troubleshooting.md)** - Common issues and solutions
+- **[[troubleshooting]]** - Common issues and solutions
 <!-- If any operations/*.md files are missing, create or update as needed. -->
 
 ### 🔌 Integration
@@ -63,18 +66,18 @@ Welcome to the comprehensive documentation for **nMapping+**, a self-hosted netw
 ### For New Users
 
 1. Start with the **[[deployment-guide|Deployment Guide]]** for complete setup instructions
-2. Review **[System Architecture](architecture/overview.md)** to understand the components
-3. Follow **[Scanner Configuration](configuration/scanner.md)** to customize scanning
+2. Review **[[overview|System Architecture]]** to understand the components
+3. Follow **[[scanner|Scanner Configuration]]** to customize scanning
 
 ### For Administrators
 
-1. Review **[Security Configuration](configuration/security.md)** for hardening
-2. Set up **[Monitoring Guide](operations/monitoring.md)** for operational visibility
-3. Plan **[Backup and Recovery](operations/backup.md)** strategies
+1. Review **[[nMapping+/docs/configuration/security|Security Configuration]]** for hardening
+2. Set up **[[monitoring|Monitoring Guide]]** for operational visibility
+3. Plan **[[backup|Backup and Recovery]]** strategies
 
 ### For Developers
 
-1. Understand the **[API Specification](architecture/api.md)** for integration
+1. Understand the **[[api|API Specification]]** for integration
 2. Review **[Custom Development](advanced/development.md)** guidelines
 3. Explore **[Third-party APIs](integration/apis.md)** for extension possibilities
 

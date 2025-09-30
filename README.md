@@ -1,6 +1,14 @@
 # nMapping+
 
+[![Version](https://img.shields.io/github/v/release/th3Wheel/nmapping-plus?label=Version)](https://github.com/th3Wheel/nmapping-plus/releases)
+[[fan-control-deltaT/node_modules/get-caller-file/LICENSE]]
+[![CI/CD](https://github.com/th3Wheel/nmapping-plus/workflows/CI/badge.svg)](https://github.com/th3Wheel/nmapping-plus/actions)
+[![Semantic Versioning](https://img.shields.io/badge/semver-2.0.0-blue)](https://semver.org/)
+[![Conventional Commits](https://img.shields.io/badge/conventional%20commits-1.0.0-yellow)](https://conventionalcommits.org/)
+
 ## Self-hosted Network Mapping with Real-time Web Dashboard
+
+**Current Version: 0.1.0** | **Status: Initial Development**
 
 A comprehensive, zero-cost network monitoring solution that combines Nmap scanning, Git-based change tracking, and a modern web dashboard for real-time network visibility. Built on **Proxmox VE Community Scripts** for reliable LXC deployment.
 
@@ -334,7 +342,7 @@ We welcome contributions from the community! Here's how you can help:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [[fan-control-deltaT/node_modules/get-caller-file/LICENSE|LICENSE]] file for details.
 
 ---
 

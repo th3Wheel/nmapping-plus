@@ -5,182 +5,105 @@ All notable changes to the nMapping+ project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-01-15
+## [Unreleased]
 
-### 🎉 Initial Release - "Professional Network Mapping"
+### Added
 
-This marks the first major release of nMapping+, formerly known as "Nmap Fing+". This version represents a complete rewrite and enhancement of the original network mapping concept.
+- Comprehensive semantic versioning implementation
+- Package.json for standardized version management
+- Automated release workflows with conventional commits
+- Enhanced project structure documentation
+
+## [0.1.0] - 2025-09-30
+
+### 🎉 Initial Release - "nMapping+ Foundation"
+
+This marks the foundational release of nMapping+, establishing the core architecture and semantic versioning system for future development.
 
 ### ✨ Added
 
-#### Core Platform
-- **Proxmox VE Community Scripts Integration**: Built on proven deployment foundation with 300+ tested scripts
-- **Dual-Container Architecture**: Separate scanner (LXC 201) and dashboard (LXC 202) containers for optimal performance
-- **Enhanced Project Branding**: Renamed from "Nmap Fing+" to "nMapping+" with consistent branding throughout
-- **Organized Folder Structure**: Professional project organization with scripts/, docs/, and dashboard/ directories
+#### Core Infrastructure
 
-#### Scanner Container Features
-- **Advanced Network Discovery**: Nmap and Masscan integration for comprehensive scanning
-- **Git-based Change Tracking**: Automated versioning of network changes with detailed commit history
-- **Configurable Scan Profiles**: Custom scanning configurations for different network types
-- **Performance Optimization**: Multi-threaded scanning with intelligent resource management
-- **Vulnerability Detection**: Automated security scanning with CVE integration
-- **API Integration**: REST endpoints for external tool integration
+- **Project Structure**: Organized foundation with scripts/, docs/, and dashboard/ directories
+- **Semantic Versioning**: Implemented semantic versioning starting at 0.1.0
+- **Package Management**: Added package.json with comprehensive script automation
+- **Commit Standards**: Established conventional commits with commitlint integration
+- **Release Automation**: Configured automated changelog generation and version management
 
-#### Dashboard Container Features
-- **Real-time Web Interface**: Flask-based dashboard with WebSocket real-time updates
-- **Interactive Network Topology**: Vis.js powered network visualization with device relationships
-- **Mobile-Responsive Design**: Optimized for desktop, tablet, and mobile access
-- **SQLite Database with WAL Mode**: High-performance database with optimized indexing
-- **Nginx Reverse Proxy**: Production-ready web server with caching and security headers
-- **Device Management**: Comprehensive device tracking with historical analysis
-- **Alert System**: Real-time notifications for network changes and new devices
+#### Documentation Foundation
 
-#### Installation and Deployment
-- **Enhanced Installation Scripts**: 
-  - `install_dashboard_enhanced.sh` - Complete dashboard setup with security hardening
-  - `create_nmap_lxc.sh` - Interactive LXC creation wizard with community scripts
-  - `sync_dashboard.sh` - Git synchronization service with error handling
-- **Automated Deployment**: One-command deployment with post-setup validation
-- **Interactive Wizard**: User-friendly container creation with guided configuration
-- **Security Hardening**: UFW firewall, fail2ban, and AppArmor configurations
+- **README.md**: Comprehensive project overview and documentation
+- **CONTRIBUTING.md**: Guidelines for community contributions
+- **GITHUB_SETUP.md**: GitHub integration and workflow setup
+- **PROJECT_SUMMARY.md**: High-level project summary and goals
+- **License**: MIT license for open-source distribution
 
-#### Documentation
-- **Comprehensive Guides**: Complete deployment, configuration, and troubleshooting documentation
-- **Quick Start Guide**: 30-minute setup for testing and evaluation
-- **API Documentation**: Detailed REST API reference with examples
-- **Architecture Overview**: System design documentation with Mermaid diagrams
-- **Security Guidelines**: Best practices for production deployment
+#### Development Workflow
+
+- **Git Configuration**: Proper gitignore and gitattributes setup
+- **CI/CD Foundation**: Basic continuous integration workflow
+- **Commit Linting**: Conventional commit message enforcement
+- **Issue Templates**: GitHub issue and pull request templates
 
 ### 🔧 Technical Specifications
 
-#### System Requirements
-- **Minimum**: Proxmox VE 7.0+, 4GB RAM, 20GB storage
-- **Recommended**: Proxmox VE 8.0+, 8GB RAM, 50GB SSD storage
-- **Supported OS**: Debian 11+, Ubuntu 20.04+
-- **Python**: 3.9+ with virtual environment isolation
+#### Version Management
 
-#### Database Schema
-- **Optimized SQLite**: WAL mode with performance indexing
-- **Tables**: devices, scans, network_changes with foreign key relationships
-- **Indexing**: Strategic indexes for common query patterns
-- **Performance**: Sub-second query response for networks up to 10,000 devices
+- **Semantic Versioning**: Full semver compliance (MAJOR.MINOR.PATCH)
+- **Conventional Commits**: Standardized commit message format
+- **Automated Changelog**: Generated from commit history
+- **Release Automation**: NPM scripts for version bumping and releases
 
-#### API Endpoints
-- `GET /api/devices` - List all discovered devices
-- `GET /api/devices/{ip}` - Get specific device details
-- `GET /api/scans` - Retrieve scan history
-- `GET /api/changes` - Get network change log
-- `GET /api/health` - System health check
-- `WebSocket /ws` - Real-time updates
+#### Project Organization
 
-#### Security Features
-- **Container Isolation**: Unprivileged LXC containers with resource limits
-- **Network Segmentation**: Firewall rules and network policy enforcement
-- **SSH Key Authentication**: Passwordless Git synchronization
-- **Input Validation**: SQL injection and XSS protection
-- **Access Controls**: Role-based access with secure session management
+- **Modular Structure**: Clear separation of concerns across directories
+- **Script Automation**: Comprehensive npm script collection for common tasks
+- **Documentation Standards**: Consistent markdown formatting and structure
+- **Community Guidelines**: Clear contribution and issue reporting processes
 
-### 🎯 Key Features
+### 🎯 Initial Features
 
-#### Network Discovery
-- **Multi-protocol Scanning**: ICMP, TCP, UDP discovery methods
-- **Service Fingerprinting**: OS detection and service version identification
-- **Custom Scan Profiles**: Configurable scan intensity and timing
-- **Large Network Support**: Efficient scanning of /16 networks and larger
-- **Stealth Scanning**: Low-impact discovery modes for sensitive environments
+#### Foundation Components
 
-#### Change Management
-- **Automated Detection**: Real-time identification of network changes
-- **Git Integration**: Complete audit trail with commit history
-- **Alert Generation**: Configurable notifications for critical changes
-- **Historical Analysis**: Trend analysis and pattern recognition
-- **Export Capabilities**: JSON, CSV, and XML data export
+- **Project Setup**: Basic project structure and organization
+- **Version Control**: Git-based version management with semantic versioning
+- **Documentation**: Comprehensive README and project documentation
+- **Community Tools**: Issue templates, contributing guidelines, and licensing
 
-#### Visualization and Reporting
-- **Interactive Topology**: Zoom, pan, and filter network maps
-- **Device Grouping**: Logical organization by subnet, device type, or custom criteria
-- **Status Indicators**: Visual representation of device health and availability
-- **Search and Filter**: Advanced search capabilities across all device attributes
-- **Dashboard Widgets**: Customizable information displays
+#### Development Tools
 
-### 🔄 Migration from Legacy "Nmap Fing+"
+- **Linting Configuration**: ESLint, commitlint, and formatting standards
+- **Git Hooks**: Pre-commit hooks for code quality enforcement
+- **Release Management**: Automated version bumping and changelog generation
+- **CI/CD Pipeline**: Basic continuous integration workflow
 
-#### Automated Migration
-- **Data Import**: Automatic conversion of existing scan data
-- **Configuration Migration**: Transfer of scan targets and settings
-- **Backup Creation**: Automatic backup before migration
-- **Validation Testing**: Verification of migrated data integrity
+### 🔄 Project Goals
 
-#### Breaking Changes
-- **Project Name**: "Nmap Fing+" → "nMapping+"
-- **File Structure**: New organized folder hierarchy
-- **Database Schema**: Enhanced schema with new indexing
-- **API Endpoints**: New REST API structure (backward compatibility maintained)
+#### Short-term Objectives (v0.2.0)
 
-### 🛡️ Security Considerations
+- **Core Scanner Implementation**: Basic Nmap integration and scanning functionality
+- **Data Storage**: Initial SQLite database schema and data management
+- **Git Integration**: Automated change tracking and version control
+- **Basic Dashboard**: Minimal web interface for scan result viewing
 
-#### Deployment Security
-- **Firewall Configuration**: Default-deny with specific allow rules
-- **SSL/TLS Support**: Optional HTTPS with Let's Encrypt integration
-- **Access Logging**: Comprehensive audit logs for all access
-- **Container Hardening**: AppArmor profiles and resource constraints
+#### Medium-term Objectives (v0.5.0)
 
-#### Network Security
-- **Scan Authorization**: Built-in safeguards for authorized scanning only
-- **Rate Limiting**: Configurable limits to prevent network overload
-- **Privilege Separation**: Minimal required permissions for all components
-- **Data Protection**: Encryption in transit and at rest options
+- **Enhanced Scanning**: Advanced Nmap configurations and scan profiles
+- **Real-time Updates**: WebSocket integration for live dashboard updates
+- **Device Management**: Comprehensive device tracking and management features
+- **API Foundation**: REST API for external integrations
 
-### 📊 Performance Metrics
+#### Long-term Vision (v1.0.0)
 
-#### Scalability
-- **Network Size**: Tested up to 10,000 devices
-- **Scan Speed**: Full /24 network in under 5 minutes
-- **Database Performance**: Sub-second queries on 100k+ records
-- **Memory Usage**: <2GB RAM for typical enterprise networks
-- **Concurrent Users**: 50+ simultaneous dashboard users
-
-#### Resource Utilization
-- **Scanner Container**: 1GB RAM, 2 CPU cores, 4GB storage
-- **Dashboard Container**: 2GB RAM, 2 CPU cores, 8GB storage
-- **Network Bandwidth**: <10Mbps for continuous monitoring
-- **Storage Growth**: ~1MB per day for 1000-device network
-
-### 🔮 Roadmap and Future Enhancements
-
-#### Planned Features (v1.1.0)
-- **Container Orchestration**: Docker Compose and Kubernetes support
-- **Enhanced Visualization**: 3D network topology and AR/VR views
-- **Machine Learning**: Anomaly detection and predictive analytics
-- **Multi-tenant Support**: Isolated environments for MSP deployment
-- **Advanced Reporting**: Automated report generation and scheduling
-
-#### Community Features
-- **Plugin System**: Third-party extension support
-- **Custom Dashboards**: User-configurable dashboard layouts
-- **API Extensions**: GraphQL API and webhook enhancements
-- **Integration Library**: Pre-built connectors for popular tools
-- **Community Templates**: Shared scan profiles and configurations
-
-### 🙏 Acknowledgments
-
-#### Technology Stack
-- **Proxmox VE Community Scripts**: Foundation deployment scripts
-- **Flask Framework**: Web application framework
-- **Nmap**: Network discovery and scanning
-- **Vis.js**: Network visualization library
-- **SQLite**: Database engine
-- **Nginx**: Web server and reverse proxy
-
-#### Contributors
-- Community feedback and testing
-- Proxmox VE Community Scripts project
-- Open source security and networking communities
+- **Production Ready**: Full feature set for production deployment
+- **Container Deployment**: Docker/LXC deployment automation
+- **Advanced Visualization**: Interactive network topology and device relationships
+- **Enterprise Features**: LDAP integration, advanced security, and compliance features
 
 ### 📄 License
 
 nMapping+ is released under the MIT License, ensuring:
+
 - **Free Usage**: No licensing fees for any use case
 - **Open Source**: Complete source code availability
 - **Commercial Friendly**: Unrestricted commercial deployment
@@ -188,11 +111,11 @@ nMapping+ is released under the MIT License, ensuring:
 
 ### 🔗 Resources
 
-- **Documentation**: [[index|/docs/index.md]]
-- **GitHub Repository**: https://github.com/th3Wheel/nmapping-plus
-- **Community Forum**: https://github.com/th3Wheel/nmapping-plus/discussions
-- **Bug Reports**: https://github.com/th3Wheel/nmapping-plus/issues
-- **Security Issues**: security@nmapping-plus.org
+- **Documentation**: [[README|README.md]]
+- **Contributing**: [[CONTRIBUTING|CONTRIBUTING.md]]
+- **GitHub Setup**: [[GITHUB_SETUP|GITHUB_SETUP.md]]
+- **Project Summary**: [[PROJECT_SUMMARY|PROJECT_SUMMARY.md]]
+- **Issue Tracker**: [GitHub Issues](https://github.com/th3Wheel/nmapping-plus/issues)
 
 ---
 
@@ -200,17 +123,40 @@ nMapping+ is released under the MIT License, ensuring:
 
 ### Planned Releases
 
-#### [1.1.0] - Q2 2025 (Planned)
-- Container orchestration support
-- Enhanced machine learning features
-- Multi-tenant architecture
-- Advanced API capabilities
+#### [0.2.0] - Q4 2025 (Planned)
 
-#### [1.0.1] - Q1 2025 (Planned)
-- Bug fixes and performance improvements
-- Documentation enhancements
-- Community-requested features
-- Security updates
+- Core scanning functionality
+- Database implementation
+- Basic web dashboard
+- Git change tracking
+
+#### [0.3.0] - Q1 2026 (Planned)
+
+- Enhanced dashboard features
+- Device management
+- Alert system
+- API endpoints
+
+#### [0.4.0] - Q2 2026 (Planned)
+
+- Real-time updates
+- Network visualization
+- Performance optimization
+- Configuration management
+
+#### [0.5.0] - Q3 2026 (Planned)
+
+- Container deployment
+- Security enhancements
+- Multi-network support
+- Export capabilities
+
+#### [1.0.0] - Q4 2026 (Planned)
+
+- Production-ready release
+- Enterprise features
+- Advanced visualization
+- Complete feature set
 
 ---
 
@@ -219,7 +165,10 @@ nMapping+ is released under the MIT License, ensuring:
 *This changelog follows the principles of keeping a changelog and semantic versioning. For the most up-to-date information, visit our GitHub repository.*
 
 <!-- Version Links -->
-[Unreleased]: https://github.com/th3Wheel/nmapping-plus/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/th3Wheel/nmapping-plus/releases/tag/v1.0.0
-[1.0.1]: https://github.com/th3Wheel/nmapping-plus/compare/v1.0.0...v1.0.1
-[1.1.0]: https://github.com/th3Wheel/nmapping-plus/compare/v1.0.0...v1.1.0
+[Unreleased]: https://github.com/th3Wheel/nmapping-plus/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/th3Wheel/nmapping-plus/releases/tag/v0.1.0
+[0.2.0]: https://github.com/th3Wheel/nmapping-plus/compare/v0.1.0...v0.2.0
+[0.3.0]: https://github.com/th3Wheel/nmapping-plus/compare/v0.2.0...v0.3.0
+[0.4.0]: https://github.com/th3Wheel/nmapping-plus/compare/v0.3.0...v0.4.0
+[0.5.0]: https://github.com/th3Wheel/nmapping-plus/compare/v0.4.0...v0.5.0
+[1.0.0]: https://github.com/th3Wheel/nmapping-plus/compare/v0.5.0...v1.0.0
