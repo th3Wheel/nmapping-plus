@@ -1,163 +1,30 @@
-pull request template:
-```
+# Copilot PR Summary Instructions
 
-### Summary
+When asked to generate a pull request summary, use the file .github/pull_request_template.md as the authoritative template and produce a completed PR description that fills the template's sections.
 
-Brief description of what this PR accomplishes.
+Rules:
+- Read .github/pull_request_template.md and follow its section headings exactly.
+- Produce a concise "Summary" (3–5 sentences) that explains what changed and why.
+- For "Type of Change", mark the most relevant checkbox(es) and leave others unchecked.
+- Under "Related Issues" include issue references using the form "Fixes #NNN" or "Relates to #NNN" where applicable.
+- In "Changes Made":
+  - Fill "Components Modified" by checking the items that apply.
+  - Provide a "Detailed Changes" bullet list describing the code-level changes; include file paths for key changes (short, relative paths).
+- In "Testing Performed":
+  - Provide environment details if known or mark them "N/A".
+  - Check the test scenario checkboxes that were validated.
+  - Give short test results describing success/failures and any follow-up needed.
+- For any section that does not apply, write "N/A" rather than leaving it blank.
+- Include "Documentation Updates", "Security Considerations", "Performance Impact", and "Breaking Changes" with concrete notes or "N/A".
+- In "Checklist" ensure important developer checks are either checked or explicitly noted as not applicable.
+- Add reviewer guidance under "Review Requests" with specific areas to focus on (2–3 items) and any direct questions for reviewers.
+- When possible, suggest labels and a small list of likely reviewers (use contributors mentioned in the changed files or OWNERS file; if unknown, omit suggestions).
 
-### Type of Change
+Formatting guidelines:
+- Use the same Markdown structure and checkboxes as in pull_request_template.md.
+- Use bullet lists for readability.
+- Keep the total PR description professional, clear, and under ~500 words when possible while still filling required sections.
+- Do not invent test runs or claim tests passed unless evidence is provided in the PR context.
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
-- [ ] Code refactoring
-- [ ] Performance improvement
-- [ ] Security enhancement
-
-### Related Issues
-
-Fixes #(issue number)
-Relates to #(issue number)
-
-### Changes Made
-
-#### Components Modified
-
-- [ ] Scanner container code
-- [ ] Dashboard application
-- [ ] Installation scripts
-- [ ] Documentation
-- [ ] Database schema
-- [ ] API endpoints
-- [ ] User interface
-- [ ] Configuration files
-- [ ] Tests
-
-#### Detailed Changes
-
-- Change 1: Description
-- Change 2: Description
-- Change 3: Description
-
-### Testing Performed
-
-#### Test Environment
-
-- **Proxmox VE Version:** 
-- **Container OS:** 
-- **Python Version:** 
-- **Network Size:** 
-
-#### Test Scenarios
-
-- [ ] Fresh installation tested
-- [ ] Upgrade from previous version tested
-- [ ] Single container deployment tested
-- [ ] Dual container deployment tested
-- [ ] Dashboard functionality verified
-- [ ] Scanner functionality verified
-- [ ] API endpoints tested
-- [ ] Security features validated
-- [ ] Performance impact assessed
-
-#### Test Results
-
-Describe the results of your testing, including any issues found and resolved.
-
-### Screenshots/Videos
-
-If applicable, add screenshots or videos demonstrating the changes.
-
-### Documentation Updates
-
-- [ ] README.md updated
-- [ ] Documentation files updated
-- [ ] API documentation updated
-- [ ] Changelog updated
-- [ ] Installation guide updated
-
-### Security Considerations
-
-- [ ] No security implications
-- [ ] Security review required
-- [ ] Increases security
-- [ ] Contains sensitive information (properly handled)
-
-### Performance Impact
-
-- [ ] No performance impact
-- [ ] Performance improvement
-- [ ] Minor performance impact
-- [ ] Significant performance impact (justified)
-
-### Breaking Changes
-
-If this PR contains breaking changes, describe:
-
-1. What breaks
-2. Why the change was necessary
-3. Migration path for users
-
-### Deployment Notes
-
-Any special deployment considerations or steps required.
-
-### Checklist
-
-#### Code Quality
-
-- [ ] Code follows project style guidelines
-- [ ] Self-review of code completed
-- [ ] Code is properly commented
-- [ ] No obvious errors or warnings
-- [ ] Functions/methods have appropriate error handling
-
-#### Testing
-
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] All tests pass locally
-- [ ] Manual testing completed
-- [ ] Edge cases considered and tested
-
-#### Documentation
-
-- [ ] Documentation updated to reflect changes
-- [ ] API documentation updated (if applicable)
-- [ ] README updated (if applicable)
-- [ ] Changelog entry added
-
-#### Security
-
-- [ ] No hardcoded secrets or credentials
-- [ ] Input validation implemented where needed
-- [ ] Security best practices followed
-- [ ] No known security vulnerabilities introduced
-
-#### Compatibility
-
-- [ ] Backwards compatibility maintained (or breaking changes documented)
-- [ ] Works with supported Python versions
-- [ ] Compatible with supported operating systems
-- [ ] Database migrations included (if applicable)
-
-### Review Requests
-
-#### Specific Areas for Review
-
-Please pay special attention to:
-
-- Area 1: Reason
-- Area 2: Reason
-
-#### Questions for Reviewers
-
-1. Question 1?
-2. Question 2?
-
-### Additional Notes
-
-Any additional information that would be helpful for reviewers.
-```
-
+Behavior trigger:
+- When the user asks "generate PR summary", "write PR description", "create pull request body", or similar, produce the filled template automatically using the rules above.
