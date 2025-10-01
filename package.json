@@ -1,6 +1,6 @@
 {
   "name": "nmapping-plus",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Self-hosted Network Mapping with Real-time Web Dashboard - A comprehensive, zero-cost network monitoring solution that combines Nmap scanning, Git-based change tracking, and a modern web dashboard for real-time network visibility.",
   "main": "dashboard/dashboard_app.py",
   "scripts": {

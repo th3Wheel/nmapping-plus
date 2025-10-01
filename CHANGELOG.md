@@ -5,6 +5,18 @@ All notable changes to the nMapping+ project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.0 (2025-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* Project now follows semantic versioning standards
+
+### Features
+
+* implement comprehensive semantic versioning system ([134e8e2](https://github.com/th3Wheel/nmapping-plus/commit/134e8e2fc9a3512fed9261597cd29b242140b671))
+* Initial nMapping+ v1.0.0 release ([5c86d10](https://github.com/th3Wheel/nmapping-plus/commit/5c86d1072d89a7bbcfaec69980f0a5be0801d511))
+
 ## [Unreleased]
 
 ### Added
