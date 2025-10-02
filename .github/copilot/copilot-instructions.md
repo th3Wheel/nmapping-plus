@@ -193,6 +193,105 @@ When context files don't provide specific guidance:
 - Follow SQLite database schema patterns
 - Use markdown processing patterns consistent with the codebase
 
+## nMapping+ Architecture Essentials
+
+### Dual-Container Architecture
+- **Scanner Container (LXC 201)**: Nmap scanning, Git repository storage, cron automation
+- **Dashboard Container (LXC 202)**: Flask web app, SQLite cache, Nginx proxy, WebSocket server
+- **Data Flow**: Scanner → Git commits → Dashboard pulls → SQLite cache → WebSocket updates
+- **Never** mix scanner and dashboard functionality in single components
+
+### Critical Patterns to Follow
+
+#### Database Operations (`dashboard/dashboard_app.py`)
+```python
+# Always use connection context management
+conn = self.get_db_connection()  # sqlite3.Row factory set
+try:
+    # Database operations
+    results = conn.execute("SELECT * FROM devices").fetchall()
+    conn.commit()
+finally:
+    conn.close()
+
+# Use WAL mode for concurrent access
+conn.execute("PRAGMA journal_mode=WAL")
+```
+
+#### WebSocket Real-time Updates
+```python
+# Emit updates to all connected clients
+socketio.emit('dashboard_update', data)
+
+# Client receives: socket.on('dashboard_update', callback)
+```
+
+#### Markdown Processing with Frontmatter
+```python
+import frontmatter
+
+# Parse device files with metadata
+post = frontmatter.loads(content)
+metadata = post.metadata
+content = post.content
+
+# Extract fields using regex patterns
+mac = re.search(r'\*\*MAC:\*\*\s*(.+)', content)
+```
+
+#### Git Synchronization Pattern
+```python
+# Pull latest changes from scanner repo
+subprocess.run(['git', 'pull'], cwd=scanner_path, check=True)
+
+# Process new/changed files
+for file in os.listdir(scanner_path):
+    if file.endswith('.md'):
+        process_device_file(file)
+```
+
+#### Error Handling & Logging
+```python
+# Consistent error logging with project prefix
+PROJECT_NAME = "nMapping+"
+print(f"{PROJECT_NAME}: Error syncing data: {e}")
+
+# Try/catch with specific error types
+try:
+    # Risky operation
+except subprocess.CalledProcessError as e:
+    print(f"{PROJECT_NAME}: Git operation failed: {e}")
+except Exception as e:
+    print(f"{PROJECT_NAME}: Unexpected error: {e}")
+```
+
+### Deployment Workflow Commands
+```bash
+# Full deployment (dual-container)
+npm run setup
+
+# Individual components
+npm run setup:scanner    # Install scanner
+npm run setup:dashboard  # Install dashboard
+npm run sync            # Sync data between containers
+
+# Development
+npm start               # Run dashboard locally
+```
+
+### File Organization Patterns
+- **Scripts**: `scripts/` - Bash deployment/installation scripts
+- **Dashboard**: `dashboard/` - Flask app, templates, static assets
+- **Docs**: `docs/` - Markdown documentation with mermaid diagrams
+- **Config**: Root-level JSON configs (package.json, commitlint.config.js)
+
+### Key Integration Points
+- **Proxmox VE API**: Container management via pct commands
+- **Git Repository**: Change tracking for network snapshots
+- **SQLite WAL**: Concurrent read/write database access
+- **WebSocket**: Real-time dashboard updates (SocketIO)
+- **Nginx**: Reverse proxy with SSL termination
+
 ## Copilot PR Summary Instructions
 
 When asked to generate a pull request summary, use the file .github/pull_request_template.md as the authoritative template and produce a completed PR description that fills the template's sections.

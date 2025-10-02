@@ -584,7 +584,7 @@ performance:
 
 ### Common Issues
 
-**Agent Not Starting**
+#### Agent Not Starting
 
 ```bash
 # Check agent logs
@@ -597,7 +597,7 @@ python agents/validate_config.py
 python agents/test_agent.py --agent anomaly_detection
 ```
 
-**High Memory Usage**
+#### High Memory Usage
 
 ```yaml
 # Reduce memory usage in config
@@ -607,7 +607,7 @@ performance:
   enable_gc: true  # Enable garbage collection
 ```
 
-**Agent Communication Issues**
+#### Agent Communication Issues
 
 ```bash
 # Check Redis connection
@@ -665,8 +665,8 @@ Features:
 
 ### Getting Help
 
-- **Documentation**: [Agent Framework Docs](docs/agents/)
-- **Examples**: [Agent Examples Repository](examples/agents/)
+- **Documentation**: [[nMapping+/docs/agents/index|Agent Framework Docs]]
+- **Examples**: [[nMapping+/examples/agents/README|Agent Examples Repository]]
 - **Community**: [GitHub Discussions](https://github.com/YOUR_USERNAME/nmapping-plus/discussions)
 - **Issues**: [Bug Reports](https://github.com/YOUR_USERNAME/nmapping-plus/issues)
 
