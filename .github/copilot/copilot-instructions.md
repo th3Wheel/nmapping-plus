@@ -190,4 +190,5 @@ When context files don't provide specific guidance:
 - Follow the dual-container architecture pattern (scanner + dashboard)
 - Use Git-based change tracking patterns for network data
 - Match WebSocket implementation patterns for real-time updates
+- Follow SQLite database schema patterns
 - Use markdown processing patterns consistent with the codebase
