@@ -216,81 +216,581 @@ finally:
 
 # Use WAL mode for concurrent access
 conn.execute("PRAGMA journal_mode=WAL")
+
+# Indexed queries for performance
+conn.execute("SELECT * FROM devices ORDER BY last_seen DESC, ip ASC")
 ```
 
 #### WebSocket Real-time Updates
 ```python
-# Emit updates to all connected clients
+# Server-side: Emit updates to all connected clients
 socketio.emit('dashboard_update', data)
 
-# Client receives: socket.on('dashboard_update', callback)
+# Client-side: Receive real-time updates
+socket.on('dashboard_update', function(data) {
+    updateDashboard(data);
+    updateLastUpdated();
+});
 ```
 
 #### Markdown Processing with Frontmatter
 ```python
 import frontmatter
+import re
 
 # Parse device files with metadata
 post = frontmatter.loads(content)
 metadata = post.metadata
 content = post.content
 
-# Extract fields using regex patterns
-mac = re.search(r'\*\*MAC:\*\*\s*(.+)', content)
+# Extract fields using regex patterns (from dashboard_app.py)
+mac = self.extract_field(content, r'\*\*MAC:\*\*\s*(.+)')
+vendor = self.extract_field(content, r'\*\*Vendor:\*\*\s*(.+)')
+hostname = self.extract_field(content, r'\*\*Hostname:\*\*\s*(.+)')
+first_seen = self.extract_field(content, r'\*\*First Seen:\*\*\s*(.+)')
+last_seen = self.extract_field(content, r'\*\*Last Seen:\*\*\s*(.+)')
+
+# Extract sections
+os_info = self.extract_section(content, r'## OS & Services')
+services = self.extract_services(content)
+vulnerabilities = self.extract_section(content, r'## Vulnerabilities')
 ```
 
 #### Git Synchronization Pattern
 ```python
-# Pull latest changes from scanner repo
-subprocess.run(['git', 'pull'], cwd=scanner_path, check=True)
-
-# Process new/changed files
-for file in os.listdir(scanner_path):
-    if file.endswith('.md'):
-        process_device_file(file)
+# Pull latest changes from scanner repo (from dashboard_app.py)
+def sync_from_scanner_data(self):
+    if not os.path.exists(SCANNER_DATA_PATH):
+        print(f"{PROJECT_NAME}: Scanner data path not found: {SCANNER_DATA_PATH}")
+        return False
+    
+    try:
+        # Pull latest changes
+        subprocess.run(['git', 'pull'], cwd=SCANNER_DATA_PATH, check=True, capture_output=True)
+        
+        # Process markdown files
+        self.process_device_files()
+        self.process_scan_summaries()
+        
+        print(f"{PROJECT_NAME}: Data sync completed successfully")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"{PROJECT_NAME}: Git pull failed: {e}")
+        return False
+    except Exception as e:
+        print(f"{PROJECT_NAME}: Error syncing data: {e}")
+        return False
 ```
 
-#### Error Handling & Logging
+#### Error Handling & Logging Patterns
 ```python
 # Consistent error logging with project prefix
 PROJECT_NAME = "nMapping+"
-print(f"{PROJECT_NAME}: Error syncing data: {e}")
+PROJECT_VERSION = "1.0.0"
+
+def log_error(message, error=None):
+    """Standardized error logging"""
+    if error:
+        print(f"{PROJECT_NAME}: {message}: {error}")
+    else:
+        print(f"{PROJECT_NAME}: {message}")
 
 # Try/catch with specific error types
 try:
-    # Risky operation
+    # Risky operation (e.g., git pull, database query)
+    result = subprocess.run(['git', 'pull'], check=True)
 except subprocess.CalledProcessError as e:
-    print(f"{PROJECT_NAME}: Git operation failed: {e}")
+    log_error("Git operation failed", e)
+    return False
+except FileNotFoundError as e:
+    log_error("Required file not found", e)
+    return False
 except Exception as e:
-    print(f"{PROJECT_NAME}: Unexpected error: {e}")
+    log_error("Unexpected error", e)
+    return False
+```
+
+#### Device Status Determination Logic
+```python
+def determine_device_status(self, last_seen):
+    """Determine device status based on last seen date"""
+    if not last_seen:
+        return 'unknown'
+    
+    try:
+        # Handle different date formats
+        for fmt in ['%Y-%m-%d', '%Y-%m-%d %H:%M:%S', '%d/%m/%Y', '%m/%d/%Y']:
+            try:
+                last_date = datetime.strptime(last_seen.split()[0], fmt)
+                break
+            except ValueError:
+                continue
+        else:
+            return 'unknown'
+        
+        days_diff = (datetime.now() - last_date).days
+        
+        if days_diff == 0:
+            return 'online'
+        elif days_diff <= 1:
+            return 'recently_seen'
+        elif days_diff <= 7:
+            return 'inactive'
+        else:
+            return 'offline'
+    except Exception as e:
+        log_error(f"Error parsing date '{last_seen}'", e)
+        return 'unknown'
 ```
 
 ### Deployment Workflow Commands
 ```bash
-# Full deployment (dual-container)
+# Full deployment (dual-container) - runs create_nmap_lxc.sh
 npm run setup
 
 # Individual components
-npm run setup:scanner    # Install scanner
-npm run setup:dashboard  # Install dashboard
-npm run sync            # Sync data between containers
+npm run setup:scanner    # Runs scripts/install_nmap_fingplus.sh
+npm run setup:dashboard  # Runs scripts/install_dashboard_enhanced.sh
+npm run sync            # Runs scripts/sync_dashboard.sh
 
 # Development
-npm start               # Run dashboard locally
+npm start               # python3 dashboard/dashboard_app.py
+npm run build           # echo 'Build process placeholder'
+npm run test:lint       # Linting checks
+
+# Version management
+npm run version:patch   # Semantic versioning
+npm run changelog       # Generate changelog with conventional-changelog
 ```
 
 ### File Organization Patterns
-- **Scripts**: `scripts/` - Bash deployment/installation scripts
-- **Dashboard**: `dashboard/` - Flask app, templates, static assets
-- **Docs**: `docs/` - Markdown documentation with mermaid diagrams
-- **Config**: Root-level JSON configs (package.json, commitlint.config.js)
+
+#### Scripts Directory Structure
+```
+scripts/
+├── create_nmap_lxc.sh              # Interactive LXC creation wizard
+├── install_nmap_fingplus.sh        # Scanner component installation
+├── install_dashboard_enhanced.sh   # Dashboard with community scripts
+├── sync_dashboard.sh              # Git synchronization service
+└── version-bump.ps1               # PowerShell version management
+```
+
+#### Dashboard Directory Structure
+```
+dashboard/
+├── dashboard_app.py               # Main Flask application
+├── templates/                     # Jinja2 HTML templates (if any)
+├── static/                        # CSS, JS, images (if any)
+└── requirements.txt               # Python dependencies
+```
+
+#### Documentation Structure
+```
+docs/
+├── index.md                       # Documentation hub
+├── deployment-guide.md           # Complete setup guide
+├── quick-start.md                # 30-minute setup
+├── architecture/
+│   ├── overview.md               # System architecture
+│   ├── database.md              # Database schema
+│   ├── api.md                   # API documentation
+│   └── containers.md            # Container patterns
+├── configuration/
+│   ├── dashboard.md             # Dashboard config
+│   ├── scanner.md               # Scanner config
+│   └── security.md              # Security settings
+└── operations/
+    ├── monitoring.md            # Monitoring setup
+    ├── backup.md                # Backup procedures
+    └── troubleshooting.md       # Issue resolution
+```
 
 ### Key Integration Points
-- **Proxmox VE API**: Container management via pct commands
-- **Git Repository**: Change tracking for network snapshots
-- **SQLite WAL**: Concurrent read/write database access
-- **WebSocket**: Real-time dashboard updates (SocketIO)
-- **Nginx**: Reverse proxy with SSL termination
+
+#### Proxmox VE Container Management
+```bash
+# Container creation (from create_nmap_lxc.sh)
+pct create $CT_ID local:vztmpl/debian-12-standard_12.0-1_amd64.tar.zst \
+    --hostname $HOSTNAME \
+    --memory $MEMORY \
+    --cores $CORES \
+    --net0 name=eth0,bridge=vmbr0,ip=dhcp \
+    --storage local-lvm \
+    --password $PASSWORD
+
+# Container startup
+pct start $CT_ID
+
+# Execute commands in container
+pct exec $CT_ID -- bash -c "apt update && apt upgrade -y"
+```
+
+#### Git Repository for Change Tracking
+```bash
+# Initialize scanner repository
+git init /scanner-data
+cd /scanner-data
+
+# Configure for automated commits
+git config user.name "nMapping+ Scanner"
+git config user.email "scanner@nmapping-plus.local"
+
+# Commit device changes
+git add *.md
+git commit -m "feat: update network scan results
+
+- Added 3 new devices
+- Updated 5 existing devices
+- Detected 2 service changes"
+```
+
+#### SQLite Database Schema Patterns
+```sql
+-- Devices table (from dashboard_app.py)
+CREATE TABLE IF NOT EXISTS devices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ip TEXT UNIQUE NOT NULL,
+    mac TEXT,
+    vendor TEXT,
+    hostname TEXT,
+    first_seen TEXT,
+    last_seen TEXT,
+    status TEXT DEFAULT 'unknown',
+    os_info TEXT,
+    services TEXT,
+    vulnerabilities TEXT,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Performance indexes
+CREATE INDEX IF NOT EXISTS idx_devices_ip ON devices(ip);
+CREATE INDEX IF NOT EXISTS idx_devices_status ON devices(status);
+CREATE INDEX IF NOT EXISTS idx_devices_last_seen ON devices(last_seen);
+
+-- Scans table for historical tracking
+CREATE TABLE IF NOT EXISTS scans (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    scan_type TEXT NOT NULL,           -- 'discovery', 'fingerprint', 'vuln'
+    scan_date TEXT NOT NULL,
+    devices_found INTEGER DEFAULT 0,
+    new_devices INTEGER DEFAULT 0,
+    scan_file TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_type, scan_date)
+);
+```
+
+#### WebSocket Real-time Communication
+```python
+# Flask-SocketIO setup
+app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Background sync thread
+def background_sync():
+    while True:
+        success = dashboard.sync_from_scanner_data()
+        if success:
+            data = dashboard.get_dashboard_data()
+            socketio.emit('dashboard_update', data)  # Broadcast to all clients
+        time.sleep(300)  # Sync every 5 minutes
+
+# API endpoint to trigger manual refresh
+@app.route('/api/refresh', methods=['POST', 'GET'])
+def api_refresh():
+    success = dashboard.sync_from_scanner_data()
+    data = dashboard.get_dashboard_data()
+    socketio.emit('dashboard_update', data)  # Real-time update
+    return jsonify({'success': success})
+```
+
+### Development Environment Setup
+
+#### Local Development Requirements
+```bash
+# Python environment (3.9+)
+python3 -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate     # Windows
+
+# Install dependencies
+pip install flask flask-socketio python-frontmatter
+
+# For development database
+pip install sqlite3  # Usually included with Python
+
+# For git operations
+# git should be available in PATH
+```
+
+#### Testing the Dashboard Locally
+```bash
+# Start the dashboard
+cd dashboard
+python dashboard_app.py
+
+# Dashboard will be available at:
+# http://localhost:5000
+
+# API endpoints:
+# GET  /api/dashboard     # Get all dashboard data
+# GET  /api/health        # Health check
+# POST /api/refresh       # Manual data refresh
+# GET  /api/device/<ip>   # Individual device details
+# GET  /api/stats         # Dashboard statistics
+```
+
+### Common Development Workflows
+
+#### Adding a New Device Field
+1. **Update database schema** in `NetworkDashboard.init_database()`
+2. **Add extraction logic** in `process_device_file()` method
+3. **Update API response** in `get_dashboard_data()` method
+4. **Update frontend** to display the new field
+5. **Test with sample data** to ensure proper parsing
+
+#### Adding a New Scan Type
+1. **Update scanner script** to generate new markdown files
+2. **Add processing logic** in `process_scan_summaries()` method
+3. **Update database schema** if needed for new scan metadata
+4. **Add to dashboard UI** for displaying new scan results
+5. **Update API endpoints** to expose new scan data
+
+#### Modifying Network Topology Visualization
+1. **Update data processing** in `get_dashboard_data()` method
+2. **Modify JavaScript** in dashboard HTML template
+3. **Adjust Vis.js options** for new visualization requirements
+4. **Test with various network sizes** (10, 100, 1000+ devices)
+5. **Optimize performance** for large networks
+
+### Code Quality Patterns
+
+#### Function Organization
+```python
+class NetworkDashboard:
+    def __init__(self):
+        """Initialize dashboard with configuration"""
+        self.db_path = DATABASE_PATH
+        self.init_database()
+    
+    def get_db_connection(self):
+        """Get database connection with proper configuration"""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+    
+    def sync_from_scanner_data(self):
+        """Main synchronization method - calls subprocesses safely"""
+        # Implementation with proper error handling
+        pass
+    
+    def process_device_files(self):
+        """Process all device markdown files"""
+        # Batch processing logic
+        pass
+    
+    def process_device_file(self, conn, ip, filepath):
+        """Process individual device file with transaction"""
+        # Individual file processing
+        pass
+```
+
+#### Configuration Management
+```python
+# Configuration constants at module level
+DASHBOARD_DIR = '/dashboard'
+DATABASE_PATH = os.path.join(DASHBOARD_DIR, 'data', 'dashboard.db')
+SCANNER_DATA_PATH = os.path.join(DASHBOARD_DIR, 'scanner_data')
+
+# Project information
+PROJECT_NAME = "nMapping+"
+PROJECT_VERSION = "1.0.0"
+PROJECT_DESCRIPTION = "Self-hosted network mapping with real-time web dashboard"
+```
+
+#### Logging and Debugging
+```python
+# Enable debug mode for development
+if __name__ == '__main__':
+    # Debug logging
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+    
+    # Start with debug enabled
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+```
+
+### Security Patterns
+
+#### Input Validation
+```python
+def validate_ip_address(ip):
+    """Validate IP address format"""
+    import ipaddress
+    try:
+        ipaddress.ip_address(ip)
+        return True
+    except ValueError:
+        return False
+
+def sanitize_filename(filename):
+    """Sanitize filenames to prevent path traversal"""
+    import os
+    return os.path.basename(filename)
+```
+
+#### Container Security
+```bash
+# From installation scripts - security hardening
+# Set proper permissions
+chown -R nmapping:nmapping /dashboard
+chmod 755 /dashboard
+chmod 644 /dashboard/data/dashboard.db
+
+# Firewall configuration
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw --force enable
+```
+
+### Performance Optimization Patterns
+
+#### Database Query Optimization
+```python
+# Use indexes for common queries
+CREATE INDEX IF NOT EXISTS idx_devices_last_seen ON devices(last_seen);
+CREATE INDEX IF NOT EXISTS idx_devices_status ON devices(status);
+
+# Batch operations
+def bulk_insert_devices(self, devices):
+    """Bulk insert multiple devices efficiently"""
+    conn = self.get_db_connection()
+    try:
+        conn.executemany('''
+            INSERT OR REPLACE INTO devices 
+            (ip, mac, vendor, hostname, last_seen, status)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', devices)
+        conn.commit()
+    finally:
+        conn.close()
+```
+
+#### Memory Management
+```python
+# Process large files in chunks
+def process_large_file(filepath):
+    """Process large files without loading entirely into memory"""
+    with open(filepath, 'r', encoding='utf-8') as f:
+        for line in f:
+            # Process line by line
+            process_line(line)
+```
+
+#### Caching Strategies
+```python
+# Cache frequently accessed data
+@lru_cache(maxsize=128)
+def get_device_stats():
+    """Cache device statistics to reduce database queries"""
+    # Implementation
+    pass
+
+# Clear cache when data changes
+def invalidate_cache():
+    """Clear caches after data updates"""
+    get_device_stats.cache_clear()
+```
+
+### Testing Patterns
+
+#### Unit Test Structure
+```python
+import unittest
+from unittest.mock import patch, MagicMock
+
+class TestNetworkDashboard(unittest.TestCase):
+    def setUp(self):
+        """Set up test fixtures"""
+        self.dashboard = NetworkDashboard()
+    
+    def test_device_status_determination(self):
+        """Test device status logic"""
+        # Test cases for different date scenarios
+        self.assertEqual(self.dashboard.determine_device_status("2025-01-01"), "offline")
+        self.assertEqual(self.dashboard.determine_device_status("2025-12-31"), "online")
+    
+    @patch('subprocess.run')
+    def test_git_sync_success(self, mock_subprocess):
+        """Test successful git synchronization"""
+        mock_subprocess.return_value = MagicMock(returncode=0)
+        result = self.dashboard.sync_from_scanner_data()
+        self.assertTrue(result)
+    
+    @patch('subprocess.run')
+    def test_git_sync_failure(self, mock_subprocess):
+        """Test git synchronization failure handling"""
+        mock_subprocess.side_effect = subprocess.CalledProcessError(1, 'git')
+        result = self.dashboard.sync_from_scanner_data()
+        self.assertFalse(result)
+```
+
+#### Integration Test Patterns
+```python
+def test_full_data_flow(self):
+    """Test complete data flow from scanner to dashboard"""
+    # 1. Create mock scanner data
+    # 2. Run sync process
+    # 3. Verify database updates
+    # 4. Check API responses
+    # 5. Validate WebSocket emissions
+    pass
+```
+
+### Deployment Validation
+
+#### Health Checks
+```bash
+# Container health check
+#!/bin/bash
+# Check if services are running
+if pgrep -f "python.*dashboard_app.py" > /dev/null; then
+    echo "Dashboard service is running"
+    exit 0
+else
+    echo "Dashboard service is not running"
+    exit 1
+fi
+```
+
+#### Configuration Validation
+```python
+def validate_configuration():
+    """Validate all required configuration before startup"""
+    required_paths = [
+        DASHBOARD_DIR,
+        os.path.dirname(DATABASE_PATH),
+        SCANNER_DATA_PATH
+    ]
+    
+    for path in required_paths:
+        if not os.path.exists(path):
+            raise ConfigurationError(f"Required path does not exist: {path}")
+    
+    # Validate database connectivity
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        conn.close()
+    except sqlite3.Error as e:
+        raise ConfigurationError(f"Database connection failed: {e}")
+```
+
+This detailed guidance should enable AI agents to be immediately productive with nMapping+, understanding not just what to do but how to do it following established patterns and best practices.
 
 ## Copilot PR Summary Instructions
 
