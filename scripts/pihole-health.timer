@@ -1,0 +1,9 @@
+[Unit]
+Description=Run Pi-hole health logger every 30s
+
+[Timer]
+OnUnitActiveSec=30
+Unit=pihole-health.service
+
+[Install]
+WantedBy=timers.target
