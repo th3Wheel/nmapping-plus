@@ -1,16 +1,16 @@
 # nMapping+
 
 [![Version](https://img.shields.io/github/v/release/th3Wheel/nmapping-plus?label=Version)](https://github.com/th3Wheel/nmapping-plus/releases)
-[[fan-control-deltaT/node_modules/get-caller-file/LICENSE]]
-[![CI/CD](https://github.com/th3Wheel/nmapping-plus/workflows/CI/badge.svg)](https://github.com/th3Wheel/nmapping-plus/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI/CD](https://github.com/th3Wheel/nmapping-plus/workflows/nMapping%2B%20CI%2FCD%20Pipeline/badge.svg)](https://github.com/th3Wheel/nmapping-plus/actions)
 [![Semantic Versioning](https://img.shields.io/badge/semver-2.0.0-blue)](https://semver.org/)
 [![Conventional Commits](https://img.shields.io/badge/conventional%20commits-1.0.0-yellow)](https://conventionalcommits.org/)
 
 ## Self-hosted Network Mapping with Real-time Web Dashboard
 
-**Current Version: 0.1.0** | **Status: Initial Development**
+**Current Version: 0.1.0** | **Status: Foundation Release**
 
-A comprehensive, zero-cost network monitoring solution that combines Nmap scanning, Git-based change tracking, and a modern web dashboard for real-time network visibility. Built on **Proxmox VE Community Scripts** for reliable LXC deployment.
+A comprehensive, open-source network monitoring solution that combines Nmap scanning, Git-based change tracking, and a modern web dashboard for real-time network visibility. Built on **Proxmox VE Community Scripts** for reliable LXC deployment.
 
 ## 🚀 Quick Start
 
@@ -18,41 +18,183 @@ A comprehensive, zero-cost network monitoring solution that combines Nmap scanni
 
 ```bash
 # Download and run the LXC creation wizard
-wget https://raw.githubusercontent.com/YOUR_USERNAME/nmapping-plus/main/scripts/create_nmap_lxc.sh
+wget https://raw.githubusercontent.com/th3Wheel/nmapping-plus/main/scripts/create_nmap_lxc.sh
 chmod +x create_nmap_lxc.sh
 ./create_nmap_lxc.sh
 ```
 
+> **Note:** The automated deployment requires the GitHub repository to be public. If you're working with a private repository, use the manual installation method below or make the repository public first.
+
 ### Manual Installation
 
-1. Create LXC containers using [Proxmox VE Community Scripts](https://community-scripts.github.io/ProxmoxVE/)
-2. Install scanner: Run `scripts/install_nmap_fingplus.sh` in scanner container
-3. Install dashboard: Run `scripts/install_dashboard_enhanced.sh` in dashboard container
-4. Configure Git synchronization: Use `scripts/sync_dashboard.sh` for data sync
+For users who prefer step-by-step control or need to customize the deployment:
+
+#### Prerequisites
+
+- **Proxmox VE 7.0+** installed and configured
+- **Root or sudo access** to Proxmox host
+- **Network connectivity** to download packages
+- **At least 4GB free storage** for containers
+
+#### Step 1: Download nMapping+ Scripts
+
+```bash
+# Clone or download the nMapping+ repository
+git clone https://github.com/th3Wheel/nmapping-plus.git
+cd nmapping-plus
+
+# Or download and extract manually
+wget https://github.com/th3Wheel/nmapping-plus/archive/main.zip
+unzip main.zip
+cd nmapping-plus-main
+```
+
+#### Step 2: Create LXC Containers
+
+```bash
+# Navigate to Proxmox VE web interface or use command line
+# Create containers using Proxmox VE Community Scripts
+
+# Option A: Use Proxmox web interface
+# 1. Go to your Proxmox node → Create CT
+# 2. Template: ubuntu-22.04-standard
+# 3. Set container IDs: Choose available IDs (suggested: 201 for scanner, 202 for dashboard)
+#    Note: Container IDs can be any available number in your Proxmox setup
+# 4. Configure networking, storage, and resources
+# 5. Start both containers
+
+# Option B: Use command line (replace with your storage location and preferred IDs)
+# Choose available container IDs (examples use 201/202, but use any available)
+SCANNER_ID=201  # Change to any available ID
+DASHBOARD_ID=202  # Change to any available ID
+
+pct create $SCANNER_ID local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.gz \
+  --hostname nmap-scanner \
+  --memory 1024 \
+  --cores 1 \
+  --net0 name=eth0,bridge=vmbr0,ip=dhcp \
+  --storage local-lvm \
+  --rootfs local-lvm:4
+
+pct create $DASHBOARD_ID local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.gz \
+  --hostname nmap-dashboard \
+  --memory 2048 \
+  --cores 2 \
+  --net0 name=eth0,bridge=vmbr0,ip=dhcp \
+  --storage local-lvm \
+  --rootfs local-lvm:8
+
+# Start the containers
+pct start $SCANNER_ID
+pct start $DASHBOARD_ID
+```
+
+#### Step 3: Run the nMapping+ Setup Wizard
+
+```bash
+# Copy scripts to Proxmox host
+scp scripts/create_nmap_lxc.sh root@proxmox-host:/tmp/
+scp scripts/install_dashboard_enhanced.sh root@proxmox-host:/tmp/
+
+# Make scripts executable
+chmod +x /tmp/create_nmap_lxc.sh
+chmod +x /tmp/install_dashboard_enhanced.sh
+
+# Run the setup wizard (interactive)
+./scripts/create_nmap_lxc.sh --interactive
+```
+
+#### Step 4: Install Dashboard Components
+
+```bash
+# The setup wizard generates container-specific scripts
+# Execute the generated installation script
+/tmp/install_dashboard_enhanced.sh
+
+# Or install manually in the dashboard container (use your chosen dashboard container ID)
+pct enter $DASHBOARD_ID
+
+# Inside container, run installation
+apt update && apt upgrade -y
+apt install -y python3 python3-pip python3-venv nginx git
+
+# Create Python virtual environment
+python3 -m venv /opt/nmapping
+source /opt/nmapping/bin/activate
+
+# Install Python dependencies
+pip install flask flask-socketio sqlite3 gunicorn
+
+# Clone dashboard application
+git clone https://github.com/th3Wheel/nmapping-plus.git /opt/nmapping-plus
+cd /opt/nmapping-plus/dashboard
+
+# Configure and start the dashboard
+python3 dashboard_app.py
+```
+
+#### Step 5: Configure Git Synchronization
+
+```bash
+# Set up Git repository for change tracking
+cd /opt/nmapping-plus
+git init
+git config user.name "nMapping+ Scanner"
+git config user.email "scanner@nmapping.local"
+
+# Configure sync service
+cp scripts/sync_dashboard.sh /etc/cron.hourly/
+chmod +x /etc/cron.hourly/sync_dashboard.sh
+
+# Test synchronization
+./scripts/sync_dashboard.sh --test
+```
+
+#### Step 6: Verify Installation
+
+```bash
+# Check container status
+pct list
+
+# Verify dashboard is running
+curl http://dashboard-container-ip:5000
+
+# Test WebSocket connection
+# Open browser to http://dashboard-container-ip:5000
+
+# Check logs
+tail -f /var/log/nmapping/dashboard.log
+```
 
 ---
 
 ## 📁 Project Structure
 
-```
+```text
 nMapping+/
 ├── README.md                           # This file - main project overview
 ├── scripts/                            # Installation and deployment scripts
 │   ├── create_nmap_lxc.sh             # LXC container creation wizard
-│   ├── install_nmap_fingplus.sh       # Scanner installation script
 │   ├── install_dashboard_enhanced.sh  # Dashboard installation script
-│   ├── sync_dashboard.sh              # Data synchronization service
-│   └── nmap_fingplus_git.sh           # Legacy scanner script
+│   └── sync_dashboard.sh              # Data synchronization service
 ├── dashboard/                          # Web dashboard application
-│   ├── dashboard_app.py               # Main Flask application
-│   ├── templates/                     # HTML templates
-│   ├── static/                        # CSS, JS, images
-│   └── requirements.txt               # Python dependencies
+│   └── dashboard_app.py               # Main Flask application
 └── docs/                              # Documentation
     ├── deployment-guide.md            # Complete deployment instructions
-    ├── architecture.md                # System architecture overview
-    ├── api-reference.md               # REST API documentation
-    └── troubleshooting.md             # Common issues and solutions
+    ├── architecture/                  # System architecture documentation
+    │   ├── overview.md                # System architecture overview
+    │   ├── api.md                     # REST API documentation
+    │   ├── containers.md              # Container deployment guide
+    │   └── database.md                # Database configuration
+    ├── configuration/                 # Configuration guides
+    │   ├── dashboard.md               # Dashboard configuration
+    │   ├── git-sync.md                # Git synchronization setup
+    │   ├── scanner.md                 # Scanner configuration
+    │   └── security.md                # Security hardening
+    └── operations/                    # Operational guides
+        ├── backup.md                  # Backup procedures
+        ├── monitoring.md              # Monitoring setup
+        └── troubleshooting.md         # Common issues and solutions
 ```
 
 ---
@@ -99,28 +241,38 @@ graph TB
 
 ## 🌟 Features
 
-### Core Network Monitoring
+### ✅ Implemented in v0.1.0
+
+#### Modern Web Dashboard
+
+- **Real-time Updates:** WebSocket-powered live monitoring
+- **Interactive Topology:** Visual network device relationships  
+- **Mobile-Responsive:** Optimized for desktop, tablet, and mobile
+- **Advanced Search:** Filter devices by IP, MAC, hostname, service
+- **Device Management:** Quick access to device details and status
+- **Export Capabilities:** CSV/JSON data export for analysis
+
+#### Core Infrastructure
+
+- **Git-based Change Tracking:** Automated audit trail of network changes
+- **REST API:** Programmatic access for external integrations
+- **SQLite Database:** Optimized for fast queries and analytics
+- **WebSocket Integration:** Live updates without page refresh
+- **Container Deployment:** Proxmox VE LXC container support
+
+### 🚧 Planned for Future Releases
+
+#### Network Scanning & Discovery
 
 - **Automated Discovery:** Scheduled Nmap scans for device detection
 - **Service Fingerprinting:** OS and service identification
 - **Vulnerability Scanning:** Security assessment with CVE mapping
-- **Change Tracking:** Git-based audit trail of all network changes
 - **Alert System:** Notifications for new devices and vulnerabilities
 
-### Modern Web Dashboard
-
-- **Real-time Updates:** WebSocket-powered live monitoring
-- **Interactive Topology:** Visual network device relationships
-- **Mobile-Responsive:** Optimized for desktop, tablet, and mobile
-- **Advanced Search:** Filter devices by IP, MAC, hostname, service
-- **Device Management:** Quick access to blocking and isolation commands
-- **Export Capabilities:** CSV/JSON data export for analysis
-
-### Enterprise Features
+#### Enterprise Features
 
 - **Multi-VLAN Support:** Segment-aware network monitoring
 - **LDAP/AD Integration:** Enterprise directory integration
-- **REST API:** Programmatic access for external integrations
 - **Compliance Reporting:** Automated reports for auditing
 - **High Availability:** Optional clustering for mission-critical environments
 
@@ -136,32 +288,31 @@ graph TB
 ./scripts/create_nmap_lxc.sh --both
 ```
 
-- **Scanner Container:** Dedicated to Nmap operations and Git repository
+- **Scanner Container:** Dedicated to future Nmap operations and Git repository
 - **Dashboard Container:** Web interface with SQLite cache and Nginx proxy
 - **Benefits:** Component isolation, optimal performance, easier maintenance
 
-### 2. Single Container Setup
+### 2. Individual Container Setup
 
-**Best for:** Small networks, testing, resource-constrained environments
-
-```bash
-./scripts/create_nmap_lxc.sh --single
-./scripts/install_dashboard_enhanced.sh --single-container
-```
-
-- **Combined Container:** Both scanner and dashboard in one LXC
-- **Benefits:** Simpler setup, lower resource usage, easier management
-
-### 3. Docker Alternative
-
-**Best for:** Modern containerized environments, cloud deployments
+**Best for:** Custom configurations, testing specific components
 
 ```bash
-./scripts/create_nmap_lxc.sh --docker
+# Create scanner container only
+./scripts/create_nmap_lxc.sh --scanner
+
+# Create dashboard container only  
+./scripts/create_nmap_lxc.sh --dashboard
+
+# Install dashboard software
+./scripts/install_dashboard_enhanced.sh
 ```
 
-- **Container Platform:** Docker-based deployment option
-- **Benefits:** Modern orchestration, easy scaling, cloud-native approach
+- **Modular Deployment:** Install components separately as needed
+- **Benefits:** Flexible configuration, component-level control
+
+### 3. Alternative Deployment Options
+
+**For advanced users:** Check `./scripts/create_nmap_lxc.sh --alternatives` for additional deployment methods including Docker and enterprise options.
 
 ---
 
@@ -241,16 +392,9 @@ graph TB
 | Script | Purpose | Location |
 |--------|---------|----------|
 | `create_nmap_lxc.sh` | Interactive LXC container creation | `scripts/` |
-| `install_nmap_fingplus.sh` | Scanner component installation | `scripts/` |
 | `install_dashboard_enhanced.sh` | Dashboard installation with community scripts | `scripts/` |
 | `sync_dashboard.sh` | Data synchronization between containers | `scripts/` |
 | `dashboard_app.py` | Main Flask web application | `dashboard/` |
-
-### Legacy Scripts
-
-| Script | Purpose | Notes |
-|--------|---------|-------|
-| `nmap_fingplus_git.sh` | Original scanner script | Single-container deployment |
 
 ---
 
@@ -258,22 +402,15 @@ graph TB
 
 ### Getting Started
 
-- **[[deployment-guide|Deployment Guide]]** - Complete installation and setup instructions
-- **[Architecture Overview](docs/architecture.md)** - System design and component relationships
-- **[[quick-start|Quick Start Tutorial]]** - 10-minute setup guide
+- **[Deployment Guide](docs/deployment-guide.md)** - Complete installation and setup instructions
+- **[Architecture Overview](docs/architecture/overview.md)** - System design and component relationships
+- **[Quick Start Tutorial](docs/quick-start.md)** - 10-minute setup guide
 
 ### Advanced Topics
 
-- **[API Reference](docs/api-reference.md)** - REST API endpoints and WebSocket events
-- **[Security Guide](docs/security.md)** - Hardening and best practices
-- **[Performance Tuning](docs/performance.md)** - Optimization for different environments
-- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
-
-### Integration Guides
-
-- **[LDAP Integration](docs/ldap-integration.md)** - Enterprise directory setup
-- **[Webhook Configuration](docs/webhooks.md)** - External system integrations
-- **[Custom Alerting](docs/alerting.md)** - Notification configuration
+- **[API Reference](docs/architecture/api.md)** - REST API endpoints and WebSocket events
+- **[Security Guide](docs/configuration/security.md)** - Hardening and best practices
+- **[Troubleshooting](docs/operations/troubleshooting.md)** - Common issues and solutions
 
 ---
 
@@ -342,7 +479,7 @@ We welcome contributions from the community! Here's how you can help:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [[fan-control-deltaT/node_modules/get-caller-file/LICENSE|LICENSE]] file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -358,11 +495,11 @@ This project is licensed under the MIT License - see the [[fan-control-deltaT/no
 
 ## 🔗 Quick Links
 
-- **GitHub Repository:** [https://github.com/YOUR_USERNAME/nmapping-plus](https://github.com/YOUR_USERNAME/nmapping-plus)
+- **GitHub Repository:** [https://github.com/th3Wheel/nmapping-plus](https://github.com/th3Wheel/nmapping-plus)
 - **Documentation:** [docs/](docs/)
 - **Community Scripts:** [https://community-scripts.github.io/ProxmoxVE/](https://community-scripts.github.io/ProxmoxVE/)
-- **Issue Tracker:** [GitHub Issues](https://github.com/YOUR_USERNAME/nmapping-plus/issues)
+- **Issue Tracker:** [GitHub Issues](https://github.com/th3Wheel/nmapping-plus/issues)
 
 ---
 
-**Ready to get started?** Follow the [[deployment-guide|Deployment Guide]] for step-by-step installation instructions!
+**Ready to get started?** Follow the [Deployment Guide](docs/deployment-guide.md) for step-by-step installation instructions!

@@ -11,9 +11,10 @@ PROJECT_NAME="nMapping+"
 PROJECT_VERSION="1.0.0"
 PROJECT_DESCRIPTION="Self-hosted network mapping with real-time web dashboard"
 
-# Container Configuration
-SCANNER_CT_ID="${SCANNER_CT_ID:-201}"
-DASHBOARD_CT_ID="${DASHBOARD_CT_ID:-202}"
+# Container Configuration - Auto-assigned IDs
+# IDs will be automatically assigned starting from 100
+SCANNER_CT_ID=""
+DASHBOARD_CT_ID=""
 DEFAULT_PASSWORD=""
 DEFAULT_STORAGE="local-lvm"
 DEFAULT_NETWORK="vmbr0"
@@ -108,14 +109,14 @@ show_community_scripts_info() {
     echo
     echo -e "${YELLOW}📦 Recommended Base Containers for ${PROJECT_NAME}:${NC}"
     echo
-    echo -e "${GREEN}📊 Dashboard Container (LXC ${DASHBOARD_CT_ID}):${NC}"
+    echo -e "${GREEN}📊 Dashboard Container (auto-assigned ID):${NC}"
     echo "   • Base: Debian 12 (stable, well-supported)"
     echo "   • RAM: 2GB (handles web interface + database)"
     echo "   • Storage: 8GB (application + logs + database)"
     echo "   • CPU: 2 cores (web server + real-time updates)"
     echo "   • Features: Python 3.11, Flask, SQLite, Nginx"
     echo
-    echo -e "${GREEN}🔍 Scanner Container (LXC ${SCANNER_CT_ID}):${NC}"
+    echo -e "${GREEN}🔍 Scanner Container (auto-assigned ID):${NC}"
     echo "   • Base: Debian 12 (compatible with nmap packages)"
     echo "   • RAM: 1GB (network scanning operations)"
     echo "   • Storage: 4GB (nmap + scan results + git)"
@@ -130,22 +131,6 @@ show_community_scripts_info() {
     echo
 }
 
-# Validate container ID availability
-validate_container_id() {
-    local ct_id=$1
-    local ct_name=$2
-    
-    if pct status "$ct_id" &>/dev/null; then
-        error "Container ID $ct_id is already in use"
-        echo "Existing container: $(pct config "$ct_id" | grep hostname | cut -d: -f2 | tr -d ' ')"
-        echo "Please choose a different ID or remove the existing container."
-        return 1
-    fi
-    
-    msg_ok "Container ID $ct_id is available for $ct_name"
-    return 0
-}
-
 # Get next available container ID
 get_next_available_id() {
     local start_id=$1
@@ -158,6 +143,44 @@ get_next_available_id() {
     echo "$current_id"
 }
 
+# Auto-assign container IDs starting from 100
+auto_assign_container_ids() {
+    log "Auto-assigning container IDs..."
+    
+    # Start looking for available IDs from 100
+    local base_id=100
+    
+    # Find first available ID for scanner
+    SCANNER_CT_ID=$(get_next_available_id $base_id)
+    if [[ -z "$SCANNER_CT_ID" ]] || ! [[ "$SCANNER_CT_ID" =~ ^[0-9]+$ ]]; then
+        error "Failed to auto-assign scanner container ID. No available IDs found starting from $base_id."
+        exit 1
+    fi
+    msg_ok "Scanner container ID: $SCANNER_CT_ID"
+    
+    # Find next available ID for dashboard
+    if ! [[ "$SCANNER_CT_ID" =~ ^[0-9]+$ ]]; then
+        error "Scanner container ID is not a valid number. Cannot assign dashboard container ID."
+        exit 1
+    fi
+    DASHBOARD_CT_ID=$(get_next_available_id $((SCANNER_CT_ID + 1)))
+    if [[ -z "$DASHBOARD_CT_ID" ]] || ! [[ "$DASHBOARD_CT_ID" =~ ^[0-9]+$ ]]; then
+        error "Failed to auto-assign dashboard container ID. No available IDs found after $SCANNER_CT_ID."
+        exit 1
+    fi
+    msg_ok "Dashboard container ID: $DASHBOARD_CT_ID"
+    
+    success "Container IDs auto-assigned: Scanner=$SCANNER_CT_ID, Dashboard=$DASHBOARD_CT_ID"
+    DASHBOARD_CT_ID=$(get_next_available_id $((SCANNER_CT_ID + 1)))
+    if [[ -z "$DASHBOARD_CT_ID" ]]; then
+        error "Failed to auto-assign dashboard container ID. No available IDs found after $SCANNER_CT_ID."
+        exit 1
+    fi
+    msg_ok "Dashboard container ID: $DASHBOARD_CT_ID"
+    
+    success "Container IDs auto-assigned: Scanner=$SCANNER_CT_ID, Dashboard=$DASHBOARD_CT_ID"
+}
+
 # Enhanced container creation with community scripts
 create_scanner_container() {
     header
@@ -166,15 +189,15 @@ create_scanner_container() {
     echo -e "${GREEN}║                  🔍 Scanner Container Setup                  ║${NC}"
     echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
     echo
-    
+
+    if [[ -z "$SCANNER_CT_ID" ]]; then
+        error "Scanner container ID is not set. Please run auto_assign_container_ids or set SCANNER_CT_ID."
+        exit 1
+    fi
+
     log "Preparing to create ${PROJECT_NAME} scanner container..."
     
-    # Validate container ID
-    if ! validate_container_id "$SCANNER_CT_ID" "scanner"; then
-        local new_id=$(get_next_available_id "$SCANNER_CT_ID")
-        warning "Using next available ID: $new_id"
-        SCANNER_CT_ID=$new_id
-    fi
+    msg_ok "Using auto-assigned container ID: $SCANNER_CT_ID"
     
     echo -e "${YELLOW}📋 Scanner Container Configuration:${NC}"
     echo "   • Container ID: $SCANNER_CT_ID"
@@ -234,15 +257,15 @@ create_dashboard_container() {
     echo -e "${GREEN}║                 📊 Dashboard Container Setup                 ║${NC}"
     echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
     echo
-    
+
+    if [[ -z "$DASHBOARD_CT_ID" ]]; then
+        error "Dashboard container ID is not set. Please run auto_assign_container_ids or set DASHBOARD_CT_ID."
+        exit 1
+    fi
+
     log "Preparing to create ${PROJECT_NAME} dashboard container..."
     
-    # Validate container ID
-    if ! validate_container_id "$DASHBOARD_CT_ID" "dashboard"; then
-        local new_id=$(get_next_available_id "$DASHBOARD_CT_ID")
-        warning "Using next available ID: $new_id"
-        DASHBOARD_CT_ID=$new_id
-    fi
+    msg_ok "Using auto-assigned container ID: $DASHBOARD_CT_ID"
     
     echo -e "${YELLOW}📋 Dashboard Container Configuration:${NC}"
     echo "   • Container ID: $DASHBOARD_CT_ID"
@@ -305,19 +328,7 @@ create_both_containers_guided() {
     
     log "Setting up complete ${PROJECT_NAME} infrastructure..."
     
-    # Validate both container IDs
-    local scanner_available=true
-    local dashboard_available=true
-    
-    if ! validate_container_id "$SCANNER_CT_ID" "scanner"; then
-        scanner_available=false
-        SCANNER_CT_ID=$(get_next_available_id "$SCANNER_CT_ID")
-    fi
-    
-    if ! validate_container_id "$DASHBOARD_CT_ID" "dashboard"; then
-        dashboard_available=false
-        DASHBOARD_CT_ID=$(get_next_available_id "$DASHBOARD_CT_ID")
-    fi
+    msg_ok "Using auto-assigned container IDs: Scanner=$SCANNER_CT_ID, Dashboard=$DASHBOARD_CT_ID"
     
     echo -e "${YELLOW}📊 Infrastructure Overview:${NC}"
     echo "   • Scanner Container: LXC $SCANNER_CT_ID (nmapping-scanner)"
@@ -583,10 +594,10 @@ show_help() {
     echo "  $0 --both            # Create both containers"
     echo
     echo -e "${YELLOW}Environment Variables:${NC}"
-    echo "  SCANNER_CT_ID     Scanner container ID (default: 201)"
-    echo "  DASHBOARD_CT_ID   Dashboard container ID (default: 202)"
     echo "  DEFAULT_STORAGE   Proxmox storage name (default: local-lvm)"
     echo "  DEFAULT_NETWORK   Network bridge (default: vmbr0)"
+    echo "  SCANNER_CT_ID     Override auto-assigned scanner container ID"
+    echo "  DASHBOARD_CT_ID   Override auto-assigned dashboard container ID"
     echo
     echo -e "${YELLOW}Requirements:${NC}"
     echo "  • Must run on Proxmox VE host as root"
@@ -610,6 +621,9 @@ main() {
     
     # Validate environment
     check_proxmox_host
+    
+    # Auto-assign container IDs
+    auto_assign_container_ids
     
     # Process command line options
     case "${1:-}" in
