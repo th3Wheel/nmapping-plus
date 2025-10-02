@@ -6,7 +6,7 @@
   "scripts": {
     "version": "npm version",
     "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s",
-    "release": "npm run changelog && git add CHANGELOG.md && git commit -m 'docs: update CHANGELOG for release' && npm version",
+    "release": "npm run changelog && git add CHANGELOG.md && git commit -m \"docs: update CHANGELOG for release\" && npm version",
     "release:patch": "npm run release patch",
     "release:minor": "npm run release minor",
     "release:major": "npm run release major",
