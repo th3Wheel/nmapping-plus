@@ -148,7 +148,7 @@ When context files don't provide specific guidance:
 - Follow the same module organization patterns
 - Use Flask patterns consistent with dashboard_app.py
 - Follow SQLite database interaction patterns
-- Match SocketIO usage patterns for real-time updates
+- Match real-time update patterns as implemented in the codebase (e.g., WebSocket or other relevant technologies)
 
 ### JavaScript/TypeScript Guidelines
 - Detect and adhere to the specific ECMAScript/TypeScript version in use
