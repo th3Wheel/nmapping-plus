@@ -171,6 +171,7 @@ When context files don't provide specific guidance:
 - Follow the same approach for deprecation notices
 - Use conventional commit format as enforced by commitlint
 - Follow established patterns for changelog generation
+- Ensure commit messages include a non-empty type (e.g., 'feat', 'fix') and subject to avoid validation errors like "subject may not be empty" or "type may not be empty"
 
 ## General Best Practices
 
@@ -520,7 +521,7 @@ venv\Scripts\activate     # Windows
 pip install flask flask-socketio python-frontmatter
 
 # For development database
-pip install sqlite3  # Usually included with Python
+# sqlite3 is included with Python (no pip install needed)
 
 # For git operations
 # git should be available in PATH
@@ -722,7 +723,11 @@ class TestNetworkDashboard(unittest.TestCase):
     def test_device_status_determination(self):
         """Test device status logic"""
         # Test cases for different date scenarios
-        self.assertEqual(self.dashboard.determine_device_status("2025-01-01"), "offline")
+        from datetime import datetime, timedelta
+        from datetime import datetime
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        self.assertEqual(self.dashboard.determine_device_status(today_str), "online")
+        self.assertEqual(self.dashboard.determine_device_status(old_date), "offline")
         self.assertEqual(self.dashboard.determine_device_status("2025-12-31"), "online")
     
     @patch('subprocess.run')
