@@ -456,9 +456,18 @@ create_both_containers_guided() {
 
     echo
     success "Containers created successfully!"
-    echo -e "${YELLOW}🔐 Root Credentials:${NC}"
-    echo "   • Scanner (ID $SCANNER_CT_ID): ${SCANNER_ROOT_PASSWORD}"
-    echo "   • Dashboard (ID $DASHBOARD_CT_ID): ${DASHBOARD_ROOT_PASSWORD}"
+    # Securely write root credentials to a root-only file
+    CREDENTIALS_FILE="./nmapping_root_credentials.txt"
+    umask 077
+    {
+        echo "nMapping+ Root Credentials"
+        echo "=========================="
+        echo "Scanner (ID $SCANNER_CT_ID): ${SCANNER_ROOT_PASSWORD}"
+        echo "Dashboard (ID $DASHBOARD_CT_ID): ${DASHBOARD_ROOT_PASSWORD}"
+        echo "Change these passwords after first login."
+    } > "$CREDENTIALS_FILE"
+    chmod 600 "$CREDENTIALS_FILE"
+    echo -e "${YELLOW}🔐 Root credentials have been saved to:${NC} $CREDENTIALS_FILE"
     echo -e "${YELLOW}⚠️  Reminder:${NC} Change these passwords after first login."
     echo
     msg_info "Run ./nmapping_plus_setup.sh to complete in-container provisioning."
