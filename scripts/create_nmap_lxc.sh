@@ -665,10 +665,23 @@ create_container_automated() {
 
     msg_info "Creating ${container_type} container with ID ${container_id}..."
 
-    # Use community script for container creation (simplified example)
-    # In practice, this would call the actual community script functions
-    msg_ok "${container_type} container created successfully"
-    msg_info "Container is ready for use"
+    # Create the container using pct create
+    pct create "${container_id}" /var/lib/vz/template/cache/debian-12-standard_*.tar.gz \
+        -hostname "${hostname}" \
+        -storage "${DEFAULT_STORAGE}" \
+        -net0 "name=eth0,bridge=${DEFAULT_NETWORK},ip=dhcp" \
+        -cores "${cpu_cores}" \
+        -memory "${memory_mb}" \
+        -rootfs "${DEFAULT_STORAGE}:${storage_size}" \
+        -password "${password}" \
+        -unprivileged 1
+    if [[ $? -eq 0 ]]; then
+        msg_ok "${container_type} container created successfully"
+        msg_info "Container is ready for use"
+    else
+        error "Failed to create ${container_type} container"
+        exit 1
+    fi
 
     # Output only the password to stdout
     echo "$password"
