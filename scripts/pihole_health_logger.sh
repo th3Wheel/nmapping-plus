@@ -6,6 +6,7 @@ set -euo pipefail
 
 LOGFILE=/var/log/pihole-health.log
 TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"' EXIT
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHECK_SCRIPT="$SCRIPT_DIR/check_pihole_metrics.sh"
