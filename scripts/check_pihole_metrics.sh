@@ -5,7 +5,7 @@
 set -euo pipefail
 
 timestamp() {
-  date --utc +"%Y-%m-%dT%H:%M:%SZ"
+  date -u +"%Y-%m-%dT%H:%M:%SZ"
 }
 
 # DNS check
