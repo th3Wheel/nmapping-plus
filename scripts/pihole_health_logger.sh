@@ -7,12 +7,14 @@ set -euo pipefail
 LOGFILE=/var/log/pihole-health.log
 TMPFILE=$(mktemp)
 
-if [[ ! -x "$(pwd)/check_pihole_metrics.sh" ]]; then
-  echo "check_pihole_metrics.sh not found or not executable in current directory" >&2
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CHECK_SCRIPT="$SCRIPT_DIR/check_pihole_metrics.sh"
+if [[ ! -x "$CHECK_SCRIPT" ]]; then
+  echo "check_pihole_metrics.sh not found or not executable in $SCRIPT_DIR" >&2
   exit 2
 fi
 
-./check_pihole_metrics.sh > "$TMPFILE"
+"$CHECK_SCRIPT" > "$TMPFILE"
 jq . "$TMPFILE" >> "$LOGFILE" 2>/dev/null || cat "$TMPFILE" >> "$LOGFILE"
 rm -f "$TMPFILE"
 
