@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=scripts/pihole_health_logger.sh
-WorkingDirectory=%h
+ExecStart=/usr/local/bin/pihole_health_logger.sh
+WorkingDirectory=/
 User=root
 
 [Install]
