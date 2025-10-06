@@ -628,6 +628,31 @@ create_container_automated() {
     local cpu_cores="$5"
     local memory_mb="$6"
 
+    # Input validation
+    if [[ -z "$container_type" ]]; then
+        echo -e "${RED}Error:${NC} container_type is required." >&2
+        exit 1
+    fi
+    if [[ -z "$container_id" ]] || [[ ! "$container_id" =~ ^[0-9]+$ ]]; then
+        echo -e "${RED}Error:${NC} container_id is required and must be a number." >&2
+        exit 1
+    fi
+    if [[ -z "$hostname" ]]; then
+        echo -e "${RED}Error:${NC} hostname is required." >&2
+        exit 1
+    fi
+    if [[ -z "$storage_size" ]] || [[ ! "$storage_size" =~ ^[0-9]+[GgMm]$ ]]; then
+        echo -e "${RED}Error:${NC} storage_size is required and must be a number followed by G or M (e.g., 8G, 1024M)." >&2
+        exit 1
+    fi
+    if [[ -z "$cpu_cores" ]] || [[ ! "$cpu_cores" =~ ^[0-9]+$ ]]; then
+        echo -e "${RED}Error:${NC} cpu_cores is required and must be a number." >&2
+        exit 1
+    fi
+    if [[ -z "$memory_mb" ]] || [[ ! "$memory_mb" =~ ^[0-9]+$ ]]; then
+        echo -e "${RED}Error:${NC} memory_mb is required and must be a number." >&2
+        exit 1
+    fi
     # Generate a secure random password
     local password=$(openssl rand -base64 12)
 
