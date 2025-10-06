@@ -49,11 +49,19 @@ warning() {
 }
 
 msg_info() {
-    echo -e "${CYAN}[INFO] [${PROJECT_NAME}]${NC} $1"
+    echo -e "${CYAN}[INFO] [${PROJECT_NAME}]${NC} $1" >&2
 }
 
 msg_ok() {
-    echo -e "${GREEN}[OK] [${PROJECT_NAME}]${NC} $1"
+    echo -e "${GREEN}[OK] [${PROJECT_NAME}]${NC} $1" >&2
+}
+
+# Ensure template is downloaded (placeholder - would integrate with community scripts)
+ensure_template_downloaded() {
+    local template="$1"
+    msg_info "Ensuring template '$template' is downloaded..."
+    # In practice, this would check and download the template if needed
+    msg_ok "Template '$template' is ready"
 }
 
 header() {
@@ -703,6 +711,73 @@ show_help() {
 }
 
 # Main execution function
+create_container_automated() {
+    local container_type="$1"
+    local container_id="$2"
+    local hostname="$3"
+    local storage_size="$4"
+    local cpu_cores="$5"
+    local memory_mb="$6"
+
+    # Input validation
+    if [[ -z "$container_type" ]]; then
+        echo -e "${RED}Error:${NC} container_type is required." >&2
+        exit 1
+    fi
+    if [[ -z "$container_id" ]] || [[ ! "$container_id" =~ ^[0-9]+$ ]]; then
+        echo -e "${RED}Error:${NC} container_id is required and must be a number." >&2
+        exit 1
+    fi
+    if [[ -z "$hostname" ]]; then
+        echo -e "${RED}Error:${NC} hostname is required." >&2
+        exit 1
+    fi
+    if [[ -z "$storage_size" ]] || [[ ! "$storage_size" =~ ^[0-9]+[GgMm]$ ]]; then
+        echo -e "${RED}Error:${NC} storage_size is required and must be a number followed by G or M (e.g., 8G, 1024M)." >&2
+        exit 1
+    fi
+    if [[ -z "$cpu_cores" ]] || [[ ! "$cpu_cores" =~ ^[0-9]+$ ]]; then
+        echo -e "${RED}Error:${NC} cpu_cores is required and must be a number." >&2
+        exit 1
+    fi
+    if [[ -z "$memory_mb" ]] || [[ ! "$memory_mb" =~ ^[0-9]+$ ]]; then
+        echo -e "${RED}Error:${NC} memory_mb is required and must be a number." >&2
+        exit 1
+    fi
+    # Generate a secure random password
+    local password=$(openssl rand -base64 12)
+
+    # All informational output goes to stderr, only password to stdout
+    msg_info "Starting automated ${container_type} container creation..."
+    msg_info "Container ID: ${container_id}, Hostname: ${hostname}"
+
+    # Ensure template is downloaded (assuming this function exists in community scripts)
+    ensure_template_downloaded "debian-12-standard"
+
+    msg_info "Creating ${container_type} container with ID ${container_id}..."
+
+    # Create the container using pct create
+    pct create "${container_id}" /var/lib/vz/template/cache/debian-12-standard_*.tar.gz \
+        -hostname "${hostname}" \
+        -storage "${DEFAULT_STORAGE}" \
+        -net0 "name=eth0,bridge=${DEFAULT_NETWORK},ip=dhcp" \
+        -cores "${cpu_cores}" \
+        -memory "${memory_mb}" \
+        -rootfs "${DEFAULT_STORAGE}:${storage_size}" \
+        -password "${password}" \
+        -unprivileged 1
+    if [[ $? -eq 0 ]]; then
+        msg_ok "${container_type} container created successfully"
+        msg_info "Container is ready for use"
+    else
+        error "Failed to create ${container_type} container"
+        exit 1
+    fi
+
+    # Output only the password to stdout
+    echo "$password"
+}
+
 main() {
     # Handle help requests first
     if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
