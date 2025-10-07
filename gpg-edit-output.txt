@@ -1,0 +1,11 @@
+gpg (GnuPG) 2.4.8; Copyright (C) 2025 g10 Code GmbH
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+[GNUPG:] KEY_CONSIDERED C122E252A17EA3952D7FFFE1213E532B4B9A5DED 0
+[GNUPG:] GET_LINE keyedit.prompt
+[GNUPG:] GOT_IT
+[GNUPG:] GET_LINE keyedit.prompt
+[GNUPG:] GOT_IT
+[GNUPG:] GET_LINE keyedit.prompt
+[GNUPG:] GOT_IT

@@ -1,0 +1,11 @@
+commit 20f3468660a0bfbd55b1742b98fa53faed3612d9
+gpg: Signature made 10/06/25 21:24:14 Central Daylight Time
+gpg:                using RSA key 4D238D8437E7EB4DF22868EF9DF7F60CC2EC4EAE
+gpg: Good signature from "Thomas Wheeler <tnwheeler@gmail.com>" [ultimate]
+gpg:                 aka "Thomas Wheeler <twheeler@accuregsoftware.com>" [ultimate]
+gpg:                 aka "Thomas Wheeler (commit-signing)" [ultimate]
+gpg:                 aka "Wheeler, Thomas <thomas.wheeler@optum.com>" [ultimate]
+Author: Thomas Wheeler <tnwheeler@gmail.com>
+Date:   Mon Oct 6 21:24:13 2025 -0500
+
+    chore: test GPG signing
