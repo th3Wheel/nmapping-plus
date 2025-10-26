@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-"""
-nMapping+ Enhanced Dashboard Installation Script
-Leverages Proxmox VE Community Scripts for reliable setup and adds custom dashboard functionality.
-"""
+# nMapping+ Enhanced Dashboard Installation Script
+# Leverages Proxmox VE Community Scripts for reliable setup and adds custom dashboard functionality.
 
 set -euo pipefail
 
@@ -73,6 +71,7 @@ import_community_functions() {
     fi
     
     # Source the community functions
+    # shellcheck source=/dev/null
     source /tmp/build.func 2>/dev/null || {
         warning "Could not source community functions - using local implementations"
         return 1
@@ -494,7 +493,7 @@ collect_configuration() {
         echo -e "${YELLOW}Please provide the Git repository URL for your scanner LXC:${NC}"
         echo -e "${BLUE}Example: user@scanner-lxc-ip:/nmap/registry${NC}"
         echo -e "${BLUE}Or SSH URL: ssh://user@scanner-lxc-ip/path/to/nmap/registry${NC}"
-        read -p "Scanner Repository URL: " SCANNER_REPO_URL
+    read -r -p "Scanner Repository URL: " SCANNER_REPO_URL
         
         if [ -z "$SCANNER_REPO_URL" ]; then
             warning "Repository URL cannot be empty. Please try again."

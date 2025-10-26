@@ -157,27 +157,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Install shellcheck
+    - name: Install ShellCheck dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y shellcheck
+        bash scripts/install_shellcheck.sh
         
-    - name: Validate shell scripts
+    - name: Lint shell scripts
       run: |
-        # Find all shell scripts and validate them
-        find scripts/ -name "*.sh" -type f | while read -r script; do
-          echo "Checking $script"
-          shellcheck "$script" || echo "Warning: $script has issues"
-        done
-        
-    - name: Check script permissions
-      run: |
-        # Ensure scripts are executable
-        find scripts/ -name "*.sh" -type f | while read -r script; do
-          if [ ! -x "$script" ]; then
-            echo "Warning: $script is not executable"
-          fi
-        done
+        bash scripts/lint_shell.sh
 
   container-validation:
     name: Container Testing

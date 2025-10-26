@@ -1,0 +1,12 @@
+[Unit]
+Description=Pi-hole Health Logger
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/pihole_health_logger.sh
+WorkingDirectory=/
+User=root
+
+[Install]
+WantedBy=multi-user.target
