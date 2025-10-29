@@ -143,9 +143,21 @@ detect_changes() {
                 done
                 
                 # Count different types of changes
-                DEVICE_CHANGES=$(echo "$CHANGED_FILES" | grep -E "\.md$" | grep -v "_" | wc -l)
-                SCAN_CHANGES=$(echo "$CHANGED_FILES" | grep -E "_.*\.md$" | wc -l)
-                
+                DEVICE_CHANGES=0
+                SCAN_CHANGES=0
+
+                while IFS= read -r changed_file; do
+                    file_name="$(basename "$changed_file")"
+                    case "$file_name" in
+                        *_*.md)
+                            SCAN_CHANGES=$((SCAN_CHANGES + 1))
+                            ;;
+                        *.md)
+                            DEVICE_CHANGES=$((DEVICE_CHANGES + 1))
+                            ;;
+                    esac
+                done <<< "$CHANGED_FILES"
+
                 log "Summary: $DEVICE_CHANGES device files, $SCAN_CHANGES scan files changed"
             else
                 log "No changes detected since last sync"
@@ -287,7 +299,7 @@ EOF
     fi
     
     log "Error statistics saved to sync_stats.json"
-    exit $exit_code
+    exit "$exit_code"
 }
 
 # ===== Configuration Validation =====
@@ -411,12 +423,12 @@ case "${1:-}" in
     --test-connection)
         log "Testing connection to scanner repository..."
         if [ -n "$SCANNER_REMOTE_URL" ]; then
-            git ls-remote "$SCANNER_REMOTE_URL" >/dev/null && {
+            if git ls-remote "$SCANNER_REMOTE_URL" >/dev/null; then
                 log "SUCCESS: Connection to scanner repository successful"
-            } || {
+            else
                 log "ERROR: Cannot connect to scanner repository"
                 exit 1
-            }
+            fi
         else
             log "ERROR: SCANNER_REMOTE_URL not configured"
             exit 1

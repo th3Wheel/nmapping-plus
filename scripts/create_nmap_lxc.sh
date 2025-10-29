@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-"""
-nMapping+ LXC Container Creation Script
-Leverages Proxmox VE Community Scripts for reliable container deployment.
-"""
+# nMapping+ LXC Container Creation Script
+# Leverages Proxmox VE Community Scripts for reliable container deployment.
 
 set -euo pipefail
 
@@ -15,9 +13,14 @@ PROJECT_DESCRIPTION="Self-hosted network mapping with real-time web dashboard"
 # IDs will be automatically assigned starting from 100
 SCANNER_CT_ID=""
 DASHBOARD_CT_ID=""
-DEFAULT_PASSWORD=""
-DEFAULT_STORAGE="local-lvm"
-DEFAULT_NETWORK="vmbr0"
+DEFAULT_STORAGE="${DEFAULT_STORAGE:-local-lvm}"
+DEFAULT_NETWORK="${DEFAULT_NETWORK:-vmbr0}"
+DEBIAN_TEMPLATE="${DEBIAN_TEMPLATE:-}"
+TEMPLATE_STORAGE="${TEMPLATE_STORAGE:-local}"
+TEMPLATE_FAMILY="${TEMPLATE_FAMILY:-debian-12-standard}"
+
+SCANNER_ROOT_PASSWORD=""
+DASHBOARD_ROOT_PASSWORD=""
 
 # Colors for enhanced output
 RED='\033[0;31m'
@@ -46,11 +49,19 @@ warning() {
 }
 
 msg_info() {
-    echo -e "${CYAN}[INFO] [${PROJECT_NAME}]${NC} $1"
+    echo -e "${CYAN}[INFO] [${PROJECT_NAME}]${NC} $1" >&2
 }
 
 msg_ok() {
-    echo -e "${GREEN}[OK] [${PROJECT_NAME}]${NC} $1"
+    echo -e "${GREEN}[OK] [${PROJECT_NAME}]${NC} $1" >&2
+}
+
+# Ensure template is downloaded (placeholder - would integrate with community scripts)
+ensure_template_downloaded() {
+    local template="$1"
+    msg_info "Ensuring template '$template' is downloaded..."
+    # In practice, this would check and download the template if needed
+    msg_ok "Template '$template' is ready"
 }
 
 header() {
@@ -72,8 +83,10 @@ check_proxmox_host() {
     fi
     
     # Get Proxmox version info
-    local pve_version=$(pveversion | grep pve-manager | cut -d/ -f2 | cut -d- -f1)
-    local pve_kernel=$(pveversion | grep pve-kernel | cut -d/ -f2)
+    local pve_version
+    local pve_kernel
+    pve_version=$(pveversion | grep pve-manager | cut -d/ -f2 | cut -d- -f1)
+    pve_kernel=$(pveversion | grep pve-kernel | cut -d/ -f2)
     
     success "Running on Proxmox VE ${pve_version} (kernel: ${pve_kernel})"
     
@@ -86,7 +99,8 @@ check_proxmox_host() {
     # Check available storage
     msg_info "Checking available storage..."
     if pvesm status | grep -q "$DEFAULT_STORAGE"; then
-        local available=$(pvesm status -storage "$DEFAULT_STORAGE" | tail -n1 | awk '{print $4}')
+    local available
+    available=$(pvesm status -storage "$DEFAULT_STORAGE" | tail -n1 | awk '{print $4}')
         msg_ok "Storage '$DEFAULT_STORAGE' available: ${available}"
     else
         warning "Default storage '$DEFAULT_STORAGE' not found. Manual configuration may be required."
@@ -171,14 +185,107 @@ auto_assign_container_ids() {
     msg_ok "Dashboard container ID: $DASHBOARD_CT_ID"
     
     success "Container IDs auto-assigned: Scanner=$SCANNER_CT_ID, Dashboard=$DASHBOARD_CT_ID"
-    DASHBOARD_CT_ID=$(get_next_available_id $((SCANNER_CT_ID + 1)))
-    if [[ -z "$DASHBOARD_CT_ID" ]]; then
-        error "Failed to auto-assign dashboard container ID. No available IDs found after $SCANNER_CT_ID."
+}
+
+# Generate secure root password for automated deployments
+generate_secure_password() {
+    if command -v openssl &>/dev/null; then
+        openssl rand -base64 24 | tr -dc 'A-Za-z0-9@#%+=' | head -c 20
+    else
+        date +%s | sha256sum | base64 | tr -dc 'A-Za-z0-9@#%+=' | head -c 20
+    fi
+}
+
+resolve_debian_template() {
+    local current_template="${DEBIAN_TEMPLATE:-}"
+    if [[ -n "$current_template" ]]; then
+        echo "$current_template"
+        return
+    fi
+
+    local family="$TEMPLATE_FAMILY"
+    local storage="$TEMPLATE_STORAGE"
+    local local_candidate=""
+    local remote_candidate=""
+
+    local_candidate=$(pveam list "$storage" 2>/dev/null | awk 'NR>1 {print $2}' | awk -F/ '{print $NF}' | \
+        grep -E "^${family}_" | LC_ALL=C sort -t_ -k2,2V | tail -n1 || true)
+
+    if [[ -z "$local_candidate" ]]; then
+        pveam update >/dev/null
+        remote_candidate=$(pveam available 2>/dev/null | awk 'NR>1 {print $2}' | awk -F/ '{print $NF}' | \
+            grep -E "^${family}_" | LC_ALL=C sort -t_ -k2,2V | tail -n1 || true)
+    fi
+
+    local selected="${local_candidate:-$remote_candidate}"
+    if [[ -z "$selected" ]]; then
+        error "Unable to resolve template matching '${family}'. Set DEBIAN_TEMPLATE explicitly or adjust TEMPLATE_FAMILY."
         exit 1
     fi
-    msg_ok "Dashboard container ID: $DASHBOARD_CT_ID"
-    
-    success "Container IDs auto-assigned: Scanner=$SCANNER_CT_ID, Dashboard=$DASHBOARD_CT_ID"
+
+    echo "$selected"
+}
+
+# Ensure Debian LXC template is downloaded locally for pct creation
+ensure_template_downloaded() {
+    local template="$DEBIAN_TEMPLATE"
+    local storage="$TEMPLATE_STORAGE"
+
+    msg_info "Ensuring Debian template '$template' is available in storage '$storage'..."
+    if ! pveam list "$storage" 2>/dev/null | awk 'NR>1 {print $2}' | awk -F/ '{print $NF}' | grep -qw -- "$template"; then
+        log "Template not found locally. Updating Proxmox appliance catalog..."
+        pveam update >/dev/null
+        log "Downloading template $template to storage $storage..."
+        pveam download "$storage" "$template"
+        msg_ok "Template $template downloaded to $storage."
+    else
+        msg_ok "Template $template already present in $storage."
+    fi
+}
+
+# Create and start an LXC container non-interactively using pct
+create_container_automated() {
+    local ct_id="$1"
+    local hostname="$2"
+    local cores="$3"
+    local memory="$4"
+    local disk="$5"
+    local role="$6"
+    local password_input="$7"
+
+    if pct status "$ct_id" &>/dev/null; then
+        error "Container ID $ct_id already exists. Aborting automated deployment."
+        exit 1
+    fi
+
+    ensure_template_downloaded
+
+    local rootfs_ref="${DEFAULT_STORAGE}:${disk}"
+    local template_ref="${TEMPLATE_STORAGE}:vztmpl/${DEBIAN_TEMPLATE}"
+    local password="$password_input"
+
+    if [[ -z "$password" ]]; then
+        password=$(generate_secure_password)
+    fi
+
+    msg_info "Creating container $ct_id ($hostname) from template $DEBIAN_TEMPLATE using pct..."
+    pct create "$ct_id" "$template_ref" \
+        -hostname "$hostname" \
+        -description "${PROJECT_NAME} ${role}" \
+        -cores "$cores" \
+        -memory "$memory" \
+        -features keyctl=1,nesting=1 \
+        -unprivileged 1 \
+        -onboot 1 \
+        -net0 "name=eth0,bridge=${DEFAULT_NETWORK},ip=dhcp" \
+        -rootfs "$rootfs_ref" \
+        -password "$password" \
+        -tags "${PROJECT_NAME// /-},${role// /-}" >/dev/null
+
+    pct start "$ct_id" >/dev/null
+    msg_ok "Container $ct_id ($hostname) created and started."
+
+    echo "$password"
 }
 
 # Enhanced container creation with community scripts
@@ -346,40 +453,32 @@ create_both_containers_guided() {
     echo "5. Set up network access and firewall rules"
     echo
     
-    read -p "Proceed with automated deployment? (y/N): " -n 1 -r
+    read -r -p "Proceed with automated deployment? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log "Starting automated deployment..."
-        
-        echo
-        echo -e "${BLUE}Step 1: Creating Scanner Container${NC}"
-        echo "Please run this command and follow the prompts:"
-        echo
-        cat << EOF
-bash -c "\$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/debian.sh)"
-# Use Container ID: $SCANNER_CT_ID, Hostname: nmapping-scanner
+    SCANNER_ROOT_PASSWORD=$(create_container_automated "$SCANNER_CT_ID" "nmapping-scanner" 2 1024 4 "Scanner")
+    DASHBOARD_ROOT_PASSWORD=$(create_container_automated "$DASHBOARD_CT_ID" "nmapping-dashboard" 2 2048 8 "Dashboard")
 
-EOF
-        
-        read -p "Press Enter when scanner container creation is complete..."
-        
-        echo
-        echo -e "${BLUE}Step 2: Creating Dashboard Container${NC}"
-        echo "Please run this command and follow the prompts:"
-        echo
-        cat << EOF
-bash -c "\$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/debian.sh)"
-# Use Container ID: $DASHBOARD_CT_ID, Hostname: nmapping-dashboard
+    create_post_deployment_script
 
-EOF
-        
-        read -p "Press Enter when dashboard container creation is complete..."
-        
-        # Generate post-deployment script
-        create_post_deployment_script
-        
-        echo
-        success "Container creation completed! See post-deployment instructions below."
+    echo
+    success "Containers created successfully!"
+    # Securely write root credentials to a root-only file
+    CREDENTIALS_FILE="./nmapping_root_credentials.txt"
+    umask 077
+    {
+        echo "nMapping+ Root Credentials"
+        echo "=========================="
+        echo "Scanner (ID $SCANNER_CT_ID): ${SCANNER_ROOT_PASSWORD}"
+        echo "Dashboard (ID $DASHBOARD_CT_ID): ${DASHBOARD_ROOT_PASSWORD}"
+        echo "Change these passwords after first login."
+    } > "$CREDENTIALS_FILE"
+    chmod 600 "$CREDENTIALS_FILE"
+    echo -e "${YELLOW}🔐 Root credentials have been saved to:${NC} $CREDENTIALS_FILE"
+    echo -e "${YELLOW}⚠️  Reminder:${NC} Change these passwords after first login."
+    echo
+    msg_info "Run ./nmapping_plus_setup.sh to complete in-container provisioning."
     else
         log "Manual deployment selected - showing individual container instructions..."
         echo
@@ -535,7 +634,7 @@ deployment_wizard() {
     echo "   Learn about the foundation technology"
     echo
     
-    read -p "Enter your choice (1-6): " choice
+    read -r -p "Enter your choice (1-6): " choice
     echo
     
     case $choice in
@@ -621,6 +720,9 @@ main() {
     
     # Validate environment
     check_proxmox_host
+
+    DEBIAN_TEMPLATE="$(resolve_debian_template)"
+    msg_info "Resolved Debian template: ${DEBIAN_TEMPLATE}"
     
     # Auto-assign container IDs
     auto_assign_container_ids
