@@ -21,6 +21,16 @@ else
 fi
 dig @127.0.0.1 pi.hole +short >/dev/null 2>&1
 dns_ok=$?
+if command -v dig >/dev/null 2>&1; then
+  dig @127.0.0.1 pi.hole +short >/dev/null 2>&1
+  dns_ok=$?
+elif command -v nslookup >/dev/null 2>&1; then
+  nslookup pi.hole 127.0.0.1 >/dev/null 2>&1
+  dns_ok=$?
+else
+  echo "Error: Neither 'dig' nor 'nslookup' is available. Please install 'dnsutils' or 'bind-utils'." >&2
+  dns_ok=2
+fi
 
 # FTL process check
 if pgrep pihole-FTL >/dev/null 2>&1; then
