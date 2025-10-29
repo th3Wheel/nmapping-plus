@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"powershell.cwd": "Homelab Vault",
+		"sarif-viewer.connectToGithubCodeScanning": "off",
+		"cSpell.words": [
+			"autoencoder",
+			"fingplus",
+			"ndiff",
+			"nmap",
+			"pihole",
+			"SIEM"
+		]
+	}
+}

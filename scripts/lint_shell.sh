@@ -7,17 +7,23 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPTS_DIRS=("$ROOT_DIR/scripts" "${ROOT_DIR}/dashboard" "${ROOT_DIR}/docs")
 EXCLUDE_PATTERNS=()
 
-CHOCO_BIN="/c/ProgramData/chocolatey/bin"
-SCOOP_BIN="/c/Users/${USERNAME:-${USER:-}}/scoop/shims"
-WINGET_BIN="/c/Program Files/WindowsApps"
-
-for extra_path in "$CHOCO_BIN" "$SCOOP_BIN" "$WINGET_BIN"; do
-    if [ -d "$extra_path" ] && [[ ":$PATH:" != *":$extra_path:"* ]]; then
-        PATH="$PATH:$extra_path"
-    fi
-done
-
-export PATH
+# Add Windows-specific paths only if running on Windows
+case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+        CHOCO_BIN="/c/ProgramData/chocolatey/bin"
+        SCOOP_BIN="/c/Users/${USERNAME:-${USER:-}}/scoop/shims"
+        WINGET_BIN="/c/Program Files/WindowsApps"
+        for extra_path in "$CHOCO_BIN" "$SCOOP_BIN" "$WINGET_BIN"; do
+            if [ -d "$extra_path" ] && [[ ":$PATH:" != *":$extra_path:"* ]]; then
+                PATH="$PATH:$extra_path"
+            fi
+        done
+        export PATH
+        ;;
+    *)
+        # Non-Windows: do not modify PATH for Windows-specific tools
+        ;;
+esac
 
 if ! command -v shellcheck >/dev/null 2>&1; then
     cat <<'EOF' >&2

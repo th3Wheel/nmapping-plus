@@ -20,7 +20,7 @@ function Install-WithWinget {
     }
 
     Write-Log "Installing ShellCheck with winget..."
-    winget install --id=koalaman.shellcheck -e --silent
+    winget install --id=koalaman.shellcheck -e
     return $true
 }
 
