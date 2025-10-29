@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Pi-hole health logger every 30s
+
+[Timer]
+OnUnitActiveSec=30
+Unit=pihole-health.service
+Persistent=true
+# RandomizedDelaySec is omitted to ensure consistent 30s interval for health checks.
+
+[Install]
+WantedBy=timers.target
