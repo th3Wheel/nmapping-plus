@@ -1,0 +1,20 @@
+gpg: key "5EFFBB0C93BADC34" not found
+gpg: 5EFFBB0C93BADC34: delete key failed: Not found
+gpg: key "DFD2FAB95CC5132E" not found
+gpg: DFD2FAB95CC5132E: delete key failed: Not found
+gpg: key "1342CA01EC6F17C7" not found
+gpg: 1342CA01EC6F17C7: delete key failed: Not found
+gpg: can't do this in batch mode
+gpg: (unless you specify the key by fingerprint)
+gpg: there is a secret key for public key "52397C9BECF9B3CD"!
+gpg: use option "--delete-secret-keys" to delete it first.
+gpg: key "CDE37E3AE3FA3B38" not found
+gpg: CDE37E3AE3FA3B38: delete key failed: Not found
+
+FullName                                             Length
+--------                                             ------
+I:\obsidian\Homelab Vault\signing-key-commit.asc       5247
+I:\obsidian\Homelab Vault\signing-key-commit.pub.asc   3471
+I:\obsidian\Homelab Vault\signing-key.asc                 0
+I:\obsidian\Homelab Vault\signing-key.pub.asc          4959
+
