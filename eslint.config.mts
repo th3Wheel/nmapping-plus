@@ -26,9 +26,9 @@ export default [
     files: ["**/*.js"],
     languageOptions: { sourceType: "commonjs" },
   },
-  ...tseslint.configs.recommended,
   {
     files: ["**/*.{ts,mts,cts}"],
+    ...tseslint.configs.recommended,
     languageOptions: {
       parserOptions: {
         project: "./tsconfig.json",
