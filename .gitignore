@@ -99,6 +99,9 @@ config/secrets.yml
 *.crt
 ssl/
 
+# Copilot logs (symlink to parent-level copilot-logs repo)
+.copilot-logs
+
 # Temporary files
 *.tmp
 *.temp
