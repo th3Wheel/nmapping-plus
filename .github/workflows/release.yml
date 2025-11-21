@@ -35,9 +35,14 @@ jobs:
           BASE_BRANCH="${GITHUB_REF#refs/heads/}"
           BRANCH="release-please--branches--${BASE_BRANCH}"
           echo "Attempting to remove existing branch: $BRANCH"
-          curl -s -X DELETE \
+          RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/delete_response.txt -X DELETE \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${REPO}/git/refs/heads/${BRANCH}" || true
+            "https://api.github.com/repos/${REPO}/git/refs/heads/${BRANCH}")
+          if [ "$RESPONSE" = "204" ] || [ "$RESPONSE" = "404" ]; then
+            echo "✅ Branch cleanup successful (or branch didn't exist)"
+          else
+            echo "⚠️ Branch deletion returned HTTP $RESPONSE - continuing anyway"
+          fi
         shell: bash
 
       - name: Run release-please
