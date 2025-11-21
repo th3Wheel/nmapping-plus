@@ -42,15 +42,14 @@ Prompt engineering involves designing inputs (prompts) that guide AI systems to 
 
 ## Table of Contents
 
-1. [What is Prompt Engineering?](#what-is-prompt-engineering)
-2. [Prompt Engineering Fundamentals](#prompt-engineering-fundamentals)
-3. [Safety & Bias Mitigation](#safety--bias-mitigation)
-4. [Responsible AI Usage](#responsible-ai-usage)
-5. [Security](#security)
-6. [Testing & Validation](#testing--validation)
-7. [Documentation & Support](#documentation--support)
-8. [Templates & Checklists](#templates--checklists)
-9. [References](#references)
+1. [Prompt Engineering Fundamentals](#prompt-engineering-fundamentals)
+2. [Safety & Bias Mitigation](#safety--bias-mitigation)
+3. [Responsible AI Usage](#responsible-ai-usage)
+4. [Security](#security)
+5. [Testing & Validation](#testing--validation)
+6. [Documentation & Support](#documentation--support)
+7. [Templates & Checklists](#templates--checklists)
+8. [References](#references)
 
 ## Prompt Engineering Fundamentals
 
