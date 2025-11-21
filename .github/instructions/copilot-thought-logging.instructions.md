@@ -35,7 +35,7 @@ description: 'Copilot thought logging for persistent memory - see the process Co
 - Read configuration from `.github/copilot-config.yml` to get all logging and session_metadata settings
 - For any missing configuration entries, add them to the config file with their default values listed above
 - Note: The config file is the single source of truth once it exists, but the instructions define the initial defaults
-- Check if symlink (from config: memory_symlink_name) exists in workspace root
+- Check if the symlink specified by config: `memory_symlink_name` exists at the path given in the config
 - If symlink does not exist, create it pointing to the memory_location path
 - Ensure the target directory exists (create if needed)
 - Check if the root `.gitignore` file in the workspace contains an entry for either the memory symlink path (from config: memory_symlink_name) **OR** the global memory directory pattern (from config: memory_location, as a directory pattern)
