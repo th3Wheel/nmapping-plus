@@ -3,7 +3,6 @@ name: Release
 on:
   push:
     branches:
-      - main
       - master
     tags:
       - 'v*.*.*'
@@ -11,12 +10,13 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - main
       - master
 
 permissions:
   contents: write
+  discussions: write
   pull-requests: write
+  actions: read
 
 jobs:
   release-please:
@@ -27,6 +27,19 @@ jobs:
       version: ${{ steps.release.outputs.version }}
       pr: ${{ steps.release.outputs.pr }}
     steps:
+      - name: Remove stale release-please branch (if exists)
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          # Derive base branch name robustly
+          BASE_BRANCH="${GITHUB_REF#refs/heads/}"
+          BRANCH="release-please--branches--${BASE_BRANCH}"
+          echo "Attempting to remove existing branch: $BRANCH"
+          curl -s -X DELETE \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${REPO}/git/refs/heads/${BRANCH}" || true
+        shell: bash
+
       - name: Run release-please
         id: release
         uses: googleapis/release-please-action@v3.7.13
@@ -46,17 +59,21 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24'
           
       - name: Install dependencies
         run: |
           npm install
           
-      - name: Build and test
+      - name: Run linting
+        continue-on-error: true
+        run: npm run test:lint
+        
+      - name: Build
         run: |
-          npm run test:lint || echo "Linting checks completed"
-          npm run build || echo "Build completed"
-          
+          npm run build
+          echo "✅ Build completed successfully"
+        
       - name: Create distribution package
         run: |
           VERSION=${{ needs.release-please.outputs.version }}
@@ -74,12 +91,30 @@ jobs:
             --exclude='*.log' \
             --exclude='test_*' \
             .
-            
+          echo "✅ Distribution package created successfully"
+          
+      - name: Validate distribution package
+        run: |
+          VERSION=${{ needs.release-please.outputs.version }}
+          if [ ! -f "dist/nmapping-plus-$VERSION.tar.gz" ]; then
+            echo "❌ Distribution package not found"
+            exit 1
+          fi
+          echo "✅ Distribution package validated"
+          
+      - name: Generate checksums
+        run: |
+          cd dist
+          sha256sum nmapping-plus-${{ needs.release-please.outputs.version }}.tar.gz > checksums.txt
+          echo "✅ Checksums generated"
+
       - name: Upload release assets
-        uses: softprops/action-gh-release@a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0
+        uses: softprops/action-gh-release@v2.4.2
         with:
           tag_name: ${{ needs.release-please.outputs.tag_name }}
-          files: ./dist/nmapping-plus-${{ needs.release-please.outputs.version }}.tar.gz
+          files: |
+            ./dist/nmapping-plus-${{ needs.release-please.outputs.version }}.tar.gz
+            ./dist/checksums.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
