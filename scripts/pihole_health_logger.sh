@@ -5,6 +5,7 @@
 set -euo pipefail
 
 LOGFILE=/var/log/pihole-health.log
+ERROR_LOG=/var/log/pihole-health-error.log
 TMPFILE=$(mktemp)
 trap 'rm -f "$TMPFILE"' EXIT
 
@@ -15,16 +16,45 @@ if [[ ! -x "$CHECK_SCRIPT" ]]; then
   exit 2
 fi
 
+# Ensure log files exist
+touch "$LOGFILE" "$ERROR_LOG" 2>/dev/null || {
+  echo "Error: Cannot create or write to log files" >&2
+  exit 1
+}
+
 "$CHECK_SCRIPT" > "$TMPFILE"
+
+# Validate JSON output
+if ! jq . "$TMPFILE" > /dev/null 2>&1; then
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - Invalid JSON output from check_pihole_metrics.sh" >> "$ERROR_LOG"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - Raw output:" >> "$ERROR_LOG"
+  cat "$TMPFILE" >> "$ERROR_LOG"
+  exit 1
+fi
+
+# Append valid JSON to log with error handling
+if ! jq . "$TMPFILE" >> "$LOGFILE" 2>/dev/null; then
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - Failed to write to $LOGFILE (jq filter error)" >> "$ERROR_LOG"
+  exit 1
+fi
 if jq . "$TMPFILE" > /dev/null 2>&1; then
 # TMPFILE cleanup handled by trap on EXIT
 else
   echo "$(date '+%Y-%m-%d %H:%M:%S') - Invalid JSON output from check_pihole_metrics.sh" >> /var/log/pihole-health-error.log
 fi
 jq . "$TMPFILE" >> "$LOGFILE" 2>/dev/null || cat "$TMPFILE" >> "$LOGFILE"
-rm -f "$TMPFILE"
+if jq . "$TMPFILE" > /dev/null 2>&1; then
+# TMPFILE cleanup handled by trap on EXIT
+else
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - Invalid JSON output from check_pihole_metrics.sh" >> /var/log/pihole-health-error.log
+fi
 
 # Trim log to last 10000 lines
-tail -n 10000 "$LOGFILE" > "$LOGFILE.tmp" && mv "$LOGFILE.tmp" "$LOGFILE"
+if [[ -f "$LOGFILE" ]]; then
+  tail -n 10000 "$LOGFILE" > "$LOGFILE.tmp" && mv "$LOGFILE.tmp" "$LOGFILE" || {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - Failed to rotate log file" >> "$ERROR_LOG"
+    exit 1
+  }
+fi
 
 exit 0
