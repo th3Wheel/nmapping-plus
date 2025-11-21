@@ -80,12 +80,15 @@ Follow this sequence for all provider/module lookups:
 
 Always include HCP Terraform backend in root modules:
 
+> **⚠️ NOTE:**  
+> Replace `<HCP_TERRAFORM_ORG>` with your actual HCP Terraform organization name, and `<GITHUB_REPO_NAME>` with your repository name in the example below.
+
 ```hcl
 terraform {
   cloud {
-    organization = "<HCP_TERRAFORM_ORG>"  # Replace with your organization name
+    organization = "<HCP_TERRAFORM_ORG>"  # <-- REQUIRED: your HCP Terraform organization name
     workspaces {
-      name = "<GITHUB_REPO_NAME>"  # Replace with actual repo name
+      name = "<GITHUB_REPO_NAME>"  # <-- REQUIRED: your repository name
     }
   }
 }
