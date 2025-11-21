@@ -4,7 +4,7 @@ description: The Dynatrace Expert Agent integrates observability and security ca
 mcp-servers:
   dynatrace:
     type: 'http'
-    url: 'https://pia1134d.dev.apps.dynatracelabs.com/platform-reserved/mcp-gateway/v0.1/servers/dynatrace-mcp/mcp'
+    url: '${DYNATRACE_MCP_URL}' # Set this environment variable to your Dynatrace MCP endpoint URL
     headers: {"Authorization": "Bearer $COPILOT_MCP_DT_API_TOKEN"}
     tools: ["*"]
 ---
