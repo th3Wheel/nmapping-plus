@@ -3,7 +3,7 @@
 # This file contains settings for GitHub Copilot behavior in this repository
 
 logging:
-  # Maximum memory file size before rotation (in MB)
+  # Maximum log file size before rotation (in MB)
   max_log_size_mb: 10
   
   # Processing memory file naming pattern
