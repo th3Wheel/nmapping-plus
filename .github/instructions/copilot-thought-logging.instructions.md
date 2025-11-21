@@ -38,8 +38,8 @@ description: 'Copilot thought logging for persistent memory - see the process Co
 - Check if symlink (from config: memory_symlink_name) exists in workspace root
 - If symlink does not exist, create it pointing to the memory_location path
 - Ensure the target directory exists (create if needed)
-- Check if the root `.gitignore` file in the workspace contains an entry for the memory symlink path (from config: memory_symlink_name)
-- If not present, append the memory symlink path to the root `.gitignore` file with a comment explaining it's for Copilot memory
+- Check if the root `.gitignore` file in the workspace contains an entry for either the memory symlink path (from config: memory_symlink_name) **OR** the global memory directory pattern (from config: memory_location, as a directory pattern)
+- If neither is present, append the memory symlink path to the root `.gitignore` file with a comment explaining it's for Copilot memory (e.g., "# Copilot memory symlink; global memory directory can be tracked separately if desired")
 - Determine the current memory file name using memory_file_pattern, substituting today's date
 - If the current memory file does not exist, create it
 - If the current memory file exists and exceeds the max_log_size_mb threshold, rotate it by renaming using rotated_memory_pattern and create a new file
@@ -82,7 +82,7 @@ description: 'Copilot thought logging for persistent memory - see the process Co
 - Remind user that `.github/.copilot-memory` symlink should be added to `.gitignore` if not already present.
 - Inform user that the parent-level `copilot-global-memory/thought-logs` directory serves as Copilot's persistent memory system and can be maintained as a separate git repository for global memory across all projects.
 - If the symlink or copilot-global-memory directory was created during Phase 1, remind user to:
-  - Add `.github/.copilot-memory` to `.gitignore` to exclude the memory symlink from version control
+  - If Phase 1 was skipped or failed, add `.github/.copilot-memory` to `.gitignore` to exclude the memory symlink from version control
   - Initialize the copilot-global-memory directory as a git repository if desired for version control
   - Set up automated log scrubbing/sanitization processes to remove sensitive information
   - Configure log retention policies and backup strategies

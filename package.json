@@ -17,7 +17,7 @@
     "shellcheck:install": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/install_shellcheck.ps1",
     "shellcheck:install:posix": "bash scripts/install_shellcheck.sh",
     "test:lint": "npm run lint:shell",
-    "build": "cd dashboard/frontend && npm install && npm run build",
+    "build": "echo \"No frontend build required\"",
     "start": "python3 dashboard/dashboard_app.py",
     "setup": "bash scripts/create_nmap_lxc.sh",
     "setup:scanner": "bash scripts/install_nmap_fingplus.sh",
