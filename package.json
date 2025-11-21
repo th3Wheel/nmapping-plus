@@ -79,6 +79,10 @@
     "*.{js,json,md}": [
       "prettier --write"
     ],
+    "*.py": [
+      "black --check",
+      "flake8"
+    ],
     "*.sh": [
       "shellcheck"
     ]
