@@ -1,6 +1,6 @@
 ---
 applyTo: '**'
-description: 'Copilot thought logging for persistent memory - see the process Copilot is following where you can edit to reshape interaction or save for follow-up. REQUIREMENT: $env:USERPROFILE/devDrive directory must exist before initialization.'
+description: 'Copilot thought logging for persistent memory - see the process Copilot is following where you can edit to reshape interaction or save for follow-up. REQUIREMENT: Memory location directory must exist before initialization (Windows: $env:USERPROFILE/devDrive, Linux/macOS: $HOME/.copilot-memory).'
 ---
 
 # Copilot Thought Logging Instructions
@@ -23,7 +23,7 @@ description: 'Copilot thought logging for persistent memory - see the process Co
 - Check if `.github/copilot-config.yml` exists (path relative to workspace root)
 - If config file doesn't exist, create it with complete default configuration:
   - `logging.memory_file_pattern`: "Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md"
-  - `logging.memory_location`: "$env:USERPROFILE/devDrive/copilot-global-memory"
+  - `logging.memory_location`: "$env:USERPROFILE/devDrive/copilot-global-memory" (Windows) or "$HOME/.copilot-global-memory" (Linux/macOS)
   - `logging.memory_symlink_name`: ".github/.copilot-memory"
   - `session_metadata.include_timestamp`: true
   - `session_metadata.include_project_name`: true
@@ -33,7 +33,7 @@ description: 'Copilot thought logging for persistent memory - see the process Co
 - If config file exists, read configuration from `.github/copilot-config.yml` to get all logging and session_metadata settings
 - For any missing configuration entries in existing config, add them with their default values listed above
 - Note: The config file is the single source of truth once it exists, but the instructions define the initial defaults
-- Resolve the `logging.memory_location` path (expand environment variables if present, e.g., `$env:USERPROFILE`)
+- Resolve the `logging.memory_location` path (expand environment variables based on shell: `$env:USERPROFILE`, `%USERPROFILE%`, `$HOME`, or `${HOME}`)
 - Ensure the memory location folder exists at the resolved path (create if needed, including parent directories)
 - Ensure the thought-logs subdirectory exists at `{resolved_memory_location}/thought-logs` (create if needed)
 - Check if symlink exists at the path specified in config: `logging.memory_symlink_name` (relative to workspace root)

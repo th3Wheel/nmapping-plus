@@ -10,7 +10,13 @@ logging:
   
   # Global memory base directory (symlink target)
   # Can be relative (e.g., "../copilot-global-memory") or absolute
-  # On Windows: Use forward slashes or escaped backslashes
+  # Environment variables will be expanded based on the shell:
+  #   Windows (PowerShell): $env:USERPROFILE or %USERPROFILE%
+  #   Linux/macOS (bash/zsh): $HOME or ${HOME}
+  # Examples:
+  #   Windows: "$env:USERPROFILE/devDrive/copilot-global-memory"
+  #   Linux/macOS: "$HOME/.copilot-global-memory"
+  #   Cross-platform: "../copilot-global-memory"
   memory_location: "$env:USERPROFILE/devDrive/copilot-global-memory"
   
   # Memory symlink path (relative to workspace root)
