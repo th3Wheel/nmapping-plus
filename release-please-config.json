@@ -18,5 +18,40 @@
     {"type": "test", "section": "✅ Tests", "hidden": true},
     {"type": "build", "section": "👷 Build System", "hidden": true},
     {"type": "ci", "section": "🎡 Continuous Integration", "hidden": true}
-  ]
+  ],
+  "changelog": {
+    "exclude": {
+      "labels": [
+        "ignore-for-release"
+      ],
+      "authors": [
+        "dependabot",
+        "renovate",
+        "snyk-bot",
+        "github-actions"
+      ]
+    },
+    "categories": [
+      {
+        "title": "Breaking Changes 🛠",
+        "labels": [
+          "Semver-Major",
+          "breaking-change"
+        ]
+      },
+      {
+        "title": "Exciting New Features 🎉",
+        "labels": [
+          "Semver-Minor",
+          "enhancement"
+        ]
+      },
+      {
+        "title": "Other Changes",
+        "labels": [
+          "*"
+        ]
+      }
+    ]
+  }
 }
