@@ -37,6 +37,13 @@ if ! jq . "$TMPFILE" >> "$LOGFILE" 2>/dev/null; then
   echo "$(date '+%Y-%m-%d %H:%M:%S') - Failed to write to $LOGFILE (jq filter error)" >> "$ERROR_LOG"
   exit 1
 fi
+if jq . "$TMPFILE" > /dev/null 2>&1; then
+# TMPFILE cleanup handled by trap on EXIT
+else
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - Invalid JSON output from check_pihole_metrics.sh" >> /var/log/pihole-health-error.log
+fi
+jq . "$TMPFILE" >> "$LOGFILE" 2>/dev/null || cat "$TMPFILE" >> "$LOGFILE"
+rm -f "$TMPFILE"
 
 # Trim log to last 10000 lines
 if [[ -f "$LOGFILE" ]]; then

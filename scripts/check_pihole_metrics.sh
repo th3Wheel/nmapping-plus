@@ -19,6 +19,8 @@ else
   echo "Error: Neither 'dig' nor 'nslookup' is available. Please install 'dnsutils' or 'bind-utils'." >&2
   dns_ok=2
 fi
+dig @127.0.0.1 pi.hole +short >/dev/null 2>&1
+dns_ok=$?
 
 # FTL process check
 if pgrep pihole-FTL >/dev/null 2>&1; then
