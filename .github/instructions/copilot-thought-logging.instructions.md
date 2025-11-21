@@ -18,15 +18,26 @@ description: 'See process Copilot is following where you can edit this to reshap
 
 # Phase 1: Initialization
 
-- Create file `\Copilot-Processing.md` in workspace root
-- Populate `\Copilot-Processing.md` with user request details
+- Check if `/.copilot-logs` symlink exists in workspace root
+- If symlink does not exist, create it pointing to `../copilot-logs` (one level up from workspace root)
+- Ensure the target directory `../copilot-logs` exists (create if needed)
+- Determine the current log file name: `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md` using today's date
+- If the current log file does not exist, create it
+- If the current log file exists and exceeds 1MB in size, rotate it by renaming to `/.copilot-logs/Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md` (using hours, minutes, seconds, and milliseconds) and create a new file
+- Append to the current log file with timestamp and session details including:
+  - Timestamp in ISO 8601 format
+  - Project/repository name
+  - Workspace path
+  - Current branch (if git repository)
+  - User request details
+- Add a separator line (e.g., `---`) between entries for readability
 - Work silently without announcements until complete.
 - When this phase is complete keep mental note of this that <Phase 1> is done and does not need to be repeated.
 
 # Phase 2: Planning
 
-- Generate an action plan into the `\Copilot-Processing.md` file.
-- Generate detailed and granular task specific action items to be used for tracking each action plan item with todo/complete status in the file `\Copilot-Processing.md`.
+- Append an action plan to the current log file under the current timestamped entry.
+- Generate detailed and granular task specific action items to be used for tracking each action plan item with todo/complete status in the current log file.
 - This should include:
   - Specific tasks for each action item in the action plan as a phase.
   - Clear descriptions of what needs to be done
@@ -39,17 +50,19 @@ description: 'See process Copilot is following where you can edit this to reshap
 
 - Execute action items from the action plan in logical groupings/phases
 - Work silently without announcements until complete.
-- Update file `\Copilot-Processing.md` and mark the action item(s) as complete in the tracking.
-- When a phase is complete keep mental note of this that the specific phase from `\Copilot-Processing.md` is done and does not need to be repeated.
+- Update the current log file and mark the action item(s) as complete in the tracking.
+- When a phase is complete keep mental note of this that the specific phase from the current log file is done and does not need to be repeated.
 - Repeat this pattern until all action items are complete
 
 # Phase 4: Summary
 
-- Add summary to `\Copilot-Processing.md`
+- Add summary to the current log file `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md`
 - Work silently without announcements until complete.
 - Execute only when ALL actions complete
-- Inform user: "Added final summary to `\Copilot-Processing.md`."
-- Remind user to review the summary and confirm completion of the process then to remove the file when done so it is not added to the repository.
+- Inform user: "Added final summary to `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md`."
+- Remind user that `.copilot-logs` symlink should be added to `.gitignore` if not already present.
+- Inform user that the parent-level `copilot-logs` directory can be maintained as a separate git repository for global memory across all projects.
+- **Warning:** Logs may contain sensitive or confidential information. Always review and sanitize logs before committing them to any repository.
 
 **ENFORCEMENT RULES:**
 - NEVER write "# Phase X" headers in responses
