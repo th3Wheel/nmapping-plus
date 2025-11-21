@@ -20,7 +20,7 @@ Analyze current repository context and suggest relevant Custom Agents files from
 8. **Validate**: Ensure suggested agents would add value not already covered by existing agents
 9. **Output**: Provide structured table with suggestions, descriptions, and links to both awesome-copilot custom agents and similar local custom agents
    **AWAIT** user request to proceed with installation of specific custom agents. DO NOT INSTALL UNLESS DIRECTED TO DO SO.
-10. **Download Assets**: For requested agents, automatically download and install individual agents to `.github/agents/` folder. Do NOT adjust content of the files. Use `#todos` tool to track progress. Prioritize use of `#fetch` tool to download assets, but may use `curl` using `#runInTerminal` tool to ensure all content is retrieved.
+10. **Download Assets**: For requested agents, automatically download and install individual agents to `.github/agents/` folder. Do NOT adjust the content of the files. Use `#todos` tool to track progress. Prioritize use of `#fetch` tool to download assets, but may use `curl` using `#runInTerminal` tool to ensure all content is retrieved.
 
 ## Context Analysis Criteria
 
