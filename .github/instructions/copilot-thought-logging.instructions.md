@@ -18,12 +18,16 @@ description: 'See process Copilot is following where you can edit this to reshap
 
 # Phase 1: Initialization
 
-- Check if `/.copilot-logs` symlink exists in workspace root
-- If symlink does not exist, create it pointing to `../copilot-logs` (one level up from workspace root)
-- Ensure the target directory `../copilot-logs` exists (create if needed)
-- Determine the current log file name: `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md` using today's date
+- Check if `/.github/copilot-config.yml` exists
+- If config file doesn't exist, create it with default logging settings: max_log_size_mb=10, log_directory="../copilot-logs", symlink_name=".copilot-logs", log_file_pattern="Copilot-Processing-YYYY-MM-DD.md", rotated_log_pattern="Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md"
+- Read configuration from `/.github/copilot-config.yml` to get logging settings
+- For any missing logging configuration entries, add them to the config file with their default values
+- Check if symlink (from config) exists in workspace root
+- If symlink does not exist, create it pointing to the log_directory path
+- Ensure the target directory exists (create if needed)
+- Determine the current log file name using log_file_pattern, substituting today's date
 - If the current log file does not exist, create it
-- If the current log file exists and exceeds 1MB in size, rotate it by renaming to `/.copilot-logs/Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md` (using hours, minutes, seconds, and milliseconds) and create a new file
+- If the current log file exists and exceeds the max_log_size_mb threshold, rotate it by renaming using rotated_log_pattern and create a new file
 - Append to the current log file with timestamp and session details including:
   - Timestamp in ISO 8601 format
   - Project/repository name

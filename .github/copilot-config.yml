@@ -1,0 +1,27 @@
+---
+# Copilot Configuration
+# This file contains settings for GitHub Copilot behavior in this repository
+
+logging:
+  # Maximum log file size before rotation (in MB)
+  max_log_size_mb: 10
+  
+  # Log file naming pattern
+  log_file_pattern: "Copilot-Processing-YYYY-MM-DD.md"
+  
+  # Rotated log file naming pattern (includes timestamp)
+  rotated_log_pattern: "Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md"
+  
+  # Log directory (symlink target relative to workspace root)
+  log_directory: "../copilot-logs"
+  
+  # Symlink name in workspace
+  symlink_name: ".copilot-logs"
+
+session_metadata:
+  # Include these fields in log entries
+  include_timestamp: true
+  include_project_name: true
+  include_workspace_path: true
+  include_branch: true
+  include_user_request: true
