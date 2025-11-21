@@ -9,8 +9,6 @@ timestamp() {
 }
 
 # DNS check
-dig @127.0.0.1 pi.hole +short >/dev/null 2>&1
-dns_ok=$?
 if command -v dig >/dev/null 2>&1; then
   dig @127.0.0.1 pi.hole +short >/dev/null 2>&1
   dns_ok=$?
