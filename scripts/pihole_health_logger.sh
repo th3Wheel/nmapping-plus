@@ -48,7 +48,6 @@ if jq . "$TMPFILE" > /dev/null 2>&1; then
 else
   echo "$(date '+%Y-%m-%d %H:%M:%S') - Invalid JSON output from check_pihole_metrics.sh" >> /var/log/pihole-health-error.log
 fi
-rm -f "$TMPFILE"
 
 # Trim log to last 10000 lines
 if [[ -f "$LOGFILE" ]]; then
