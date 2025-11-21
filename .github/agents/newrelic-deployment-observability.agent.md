@@ -5,8 +5,8 @@ tools: ["read", "search", "edit", "github/*", "newrelic/*"]
 mcp-servers:
   newrelic:
     type: "http"
-    # Replace with your actual MCP gateway URL for New Relic
-    url: "https://mcp.newrelic.com/mcp"
+    # REQUIRED: Set to your actual MCP gateway URL for New Relic (e.g., https://your-mcp.example.com/mcp)
+    url: "${NEW_RELIC_MCP_URL}"
     tools: ["*"]
     # Option A: pass API key via headers (recommended for server-side MCPs)
     headers: {"Api-Key": "$COPILOT_MCP_NEW_RELIC_API_KEY"}
