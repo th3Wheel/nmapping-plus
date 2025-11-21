@@ -239,7 +239,7 @@ nMapping+/
 - **GitHub Issues**: Bug reports and feature requests
 - **GitHub Discussions**: General questions and community discussion
 - **Pull Requests**: Code review and technical discussion
-- **Security Issues**: Email security concerns to security@nmapping-plus.org
+- **Security Issues**: Email security concerns to <security@nmapping-plus.org>
 
 ### Communication Guidelines
 
