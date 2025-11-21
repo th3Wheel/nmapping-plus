@@ -105,8 +105,8 @@ python dashboard_app.py --test-mode
 nMapping+/
 ├── .github/                    # GitHub templates and workflows
 │   ├── workflows/              # CI/CD pipelines
-│   ├── ISSUE_TEMPLATE/         # Issue templates
-│   └── pull_request_template.md
+│   ├── templates/              # Issue and PR templates
+│   └── copilot-config.yml      # Copilot configuration
 ├── dashboard/                  # Web dashboard application
 │   ├── dashboard_app.py        # Main Flask application
 │   ├── templates/              # HTML templates
