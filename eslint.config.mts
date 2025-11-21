@@ -12,7 +12,7 @@ export default [
       "**/dist/**",
       "**/build/**",
       "**/.git/**",
-      "**/.copilot-memory/**",
+      "**/.github/.copilot-memory/**",
     ],
   },
   {
