@@ -3,19 +3,18 @@
 # This file contains settings for GitHub Copilot behavior in this repository
 
 logging:
-  # Maximum log file size before rotation (in MB)
-  max_log_size_mb: 10
-  
   # Processing memory file naming pattern
-  memory_file_pattern: "Copilot-Processing-YYYY-MM-DD.md"
+  # YYYY-MM-DD will be replaced with date, HHmmssSSS with timestamp
+  # Each session creates a unique file - no rotation needed
+  memory_file_pattern: "Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md"
   
-  # Rotated memory file naming pattern (includes timestamp)
-  rotated_memory_pattern: "Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md"
+  # Global memory base directory (symlink target)
+  # Can be relative (e.g., "../copilot-global-memory") or absolute
+  # On Windows: Use forward slashes or escaped backslashes
+  memory_location: "$env:USERPROFILE/devDrive/copilot-global-memory"
   
-  # Memory location (symlink target relative to workspace root)
-  memory_location: "../copilot-global-memory/thought-logs"
-  
-  # Memory symlink name (relative to workspace root)
+  # Memory symlink path (relative to workspace root)
+  # Thought logs will be stored at: {memory_symlink_name}/thought-logs
   memory_symlink_name: ".github/.copilot-memory"
 
 session_metadata:
