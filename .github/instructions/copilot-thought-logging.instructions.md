@@ -78,7 +78,7 @@ description: 'Copilot thought logging for persistent memory - see the process Co
 - Add summary to the current log file `.github/.copilot-memory/Copilot-Processing-YYYY-MM-DD.md`
 - Work silently without announcements until complete.
 - Execute only when ALL actions complete
-- Inform user: "Added final summary to `/.github/.copilot-memory/Copilot-Processing-YYYY-MM-DD.md`."
+- Inform user: "Added final summary to `.github/.copilot-memory/Copilot-Processing-YYYY-MM-DD.md`."
 - Remind user that `.github/.copilot-memory` symlink should be added to `.gitignore` if not already present.
 - Inform user that the parent-level `copilot-global-memory/thought-logs` directory serves as Copilot's persistent memory system and can be maintained as a separate git repository for global memory across all projects.
 - If the symlink or copilot-global-memory directory was created during Phase 1, remind user to:
