@@ -20,7 +20,7 @@ description: 'Copilot thought logging for persistent memory - see the process Co
 
 # Phase 1: Initialization
 
-- Check if `/.github/copilot-config.yml` exists
+- Check if `.github/copilot-config.yml` exists (path relative to workspace root)
 - If config file doesn't exist, create it with complete default configuration:
   - `logging.max_log_size_mb`: 10
   - `logging.memory_file_pattern`: "Copilot-Processing-YYYY-MM-DD.md"
@@ -32,13 +32,14 @@ description: 'Copilot thought logging for persistent memory - see the process Co
   - `session_metadata.include_workspace_path`: true
   - `session_metadata.include_branch`: true
   - `session_metadata.include_user_request`: true
-- Read configuration from `/.github/copilot-config.yml` to get all logging and session_metadata settings
+- Read configuration from `.github/copilot-config.yml` to get all logging and session_metadata settings
 - For any missing configuration entries, add them to the config file with their default values listed above
+- Note: The config file is the single source of truth once it exists, but the instructions define the initial defaults
 - Check if symlink (from config: memory_symlink_name) exists in workspace root
 - If symlink does not exist, create it pointing to the memory_location path
 - Ensure the target directory exists (create if needed)
-- Check if `.gitignore` contains an entry for the memory symlink path (from config: memory_symlink_name)
-- If not present, append the memory symlink path to `.gitignore` with a comment explaining it's for Copilot memory
+- Check if the root `.gitignore` file in the workspace contains an entry for the memory symlink path (from config: memory_symlink_name)
+- If not present, append the memory symlink path to the root `.gitignore` file with a comment explaining it's for Copilot memory
 - Determine the current memory file name using memory_file_pattern, substituting today's date
 - If the current memory file does not exist, create it
 - If the current memory file exists and exceeds the max_log_size_mb threshold, rotate it by renaming using rotated_memory_pattern and create a new file
@@ -74,7 +75,7 @@ description: 'Copilot thought logging for persistent memory - see the process Co
 
 # Phase 4: Summary
 
-- Add summary to the current log file `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md`
+- Add summary to the current log file `.github/.copilot-memory/Copilot-Processing-YYYY-MM-DD.md`
 - Work silently without announcements until complete.
 - Execute only when ALL actions complete
 - Inform user: "Added final summary to `/.github/.copilot-memory/Copilot-Processing-YYYY-MM-DD.md`."

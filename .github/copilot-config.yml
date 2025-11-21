@@ -15,7 +15,7 @@ logging:
   # Memory location (symlink target relative to workspace root)
   memory_location: "../copilot-global-memory/thought-logs"
   
-  # Memory symlink name (relative to .github folder)
+  # Memory symlink name (relative to workspace root)
   memory_symlink_name: ".github/.copilot-memory"
 
 session_metadata:
