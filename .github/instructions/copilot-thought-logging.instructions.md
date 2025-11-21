@@ -1,9 +1,11 @@
 ---
 applyTo: '**'
-description: 'See process Copilot is following where you can edit this to reshape the interaction or save when follow up may be needed'
+description: 'Copilot thought logging for persistent memory - see the process Copilot is following where you can edit to reshape interaction or save for follow-up'
 ---
 
-# Copilot Process tracking Instructions
+# Copilot Thought Logging Instructions
+
+> **Purpose**: Maintain persistent Copilot memory across all projects through structured thought logging
 
 **ABSOLUTE MANDATORY RULES:**
 - You must review these instructions in full before executing any steps to understand the full instructions guidelines.
@@ -19,21 +21,33 @@ description: 'See process Copilot is following where you can edit this to reshap
 # Phase 1: Initialization
 
 - Check if `/.github/copilot-config.yml` exists
-- If config file doesn't exist, create it with default logging settings: max_log_size_mb=10, log_directory="../copilot-logs", symlink_name=".copilot-logs", log_file_pattern="Copilot-Processing-YYYY-MM-DD.md", rotated_log_pattern="Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md"
-- Read configuration from `/.github/copilot-config.yml` to get logging settings
-- For any missing logging configuration entries, add them to the config file with their default values
-- Check if symlink (from config) exists in workspace root
-- If symlink does not exist, create it pointing to the log_directory path
+- If config file doesn't exist, create it with complete default configuration:
+  - `logging.max_log_size_mb`: 10
+  - `logging.memory_file_pattern`: "Copilot-Processing-YYYY-MM-DD.md"
+  - `logging.rotated_memory_pattern`: "Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md"
+  - `logging.memory_location`: "../copilot-global-memory/thought-logs"
+  - `logging.memory_symlink_name`: ".github/.copilot-memory"
+  - `session_metadata.include_timestamp`: true
+  - `session_metadata.include_project_name`: true
+  - `session_metadata.include_workspace_path`: true
+  - `session_metadata.include_branch`: true
+  - `session_metadata.include_user_request`: true
+- Read configuration from `/.github/copilot-config.yml` to get all logging and session_metadata settings
+- For any missing configuration entries, add them to the config file with their default values listed above
+- Check if symlink (from config: memory_symlink_name) exists in workspace root
+- If symlink does not exist, create it pointing to the memory_location path
 - Ensure the target directory exists (create if needed)
-- Determine the current log file name using log_file_pattern, substituting today's date
-- If the current log file does not exist, create it
-- If the current log file exists and exceeds the max_log_size_mb threshold, rotate it by renaming using rotated_log_pattern and create a new file
-- Append to the current log file with timestamp and session details including:
-  - Timestamp in ISO 8601 format
-  - Project/repository name
-  - Workspace path
-  - Current branch (if git repository)
-  - User request details
+- Check if `.gitignore` contains an entry for the memory symlink path (from config: memory_symlink_name)
+- If not present, append the memory symlink path to `.gitignore` with a comment explaining it's for Copilot memory
+- Determine the current memory file name using memory_file_pattern, substituting today's date
+- If the current memory file does not exist, create it
+- If the current memory file exists and exceeds the max_log_size_mb threshold, rotate it by renaming using rotated_memory_pattern and create a new file
+- Append to the current log file with session details based on session_metadata configuration:
+  - Timestamp in ISO 8601 format (if include_timestamp is true)
+  - Project/repository name (if include_project_name is true)
+  - Workspace path (if include_workspace_path is true)
+  - Current branch (if include_branch is true and git repository)
+  - User request details (if include_user_request is true)
 - Add a separator line (e.g., `---`) between entries for readability
 - Work silently without announcements until complete.
 - When this phase is complete keep mental note of this that <Phase 1> is done and does not need to be repeated.
@@ -63,9 +77,15 @@ description: 'See process Copilot is following where you can edit this to reshap
 - Add summary to the current log file `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md`
 - Work silently without announcements until complete.
 - Execute only when ALL actions complete
-- Inform user: "Added final summary to `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md`."
-- Remind user that `.copilot-logs` symlink should be added to `.gitignore` if not already present.
-- Inform user that the parent-level `copilot-logs` directory can be maintained as a separate git repository for global memory across all projects.
+- Inform user: "Added final summary to `/.github/.copilot-memory/Copilot-Processing-YYYY-MM-DD.md`."
+- Remind user that `.github/.copilot-memory` symlink should be added to `.gitignore` if not already present.
+- Inform user that the parent-level `copilot-global-memory/thought-logs` directory serves as Copilot's persistent memory system and can be maintained as a separate git repository for global memory across all projects.
+- If the symlink or copilot-global-memory directory was created during Phase 1, remind user to:
+  - Add `.github/.copilot-memory` to `.gitignore` to exclude the memory symlink from version control
+  - Initialize the copilot-global-memory directory as a git repository if desired for version control
+  - Set up automated log scrubbing/sanitization processes to remove sensitive information
+  - Configure log retention policies and backup strategies
+  - Review and sanitize logs regularly before committing to any repository
 - **Warning:** Logs may contain sensitive or confidential information. Always review and sanitize logs before committing them to any repository.
 
 **ENFORCEMENT RULES:**
