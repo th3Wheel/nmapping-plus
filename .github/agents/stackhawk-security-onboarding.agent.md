@@ -42,7 +42,7 @@ Before setting up security testing, determine if this repository represents actu
   
 - **Library/Package Indicators (skip setup):**
   - Package.json shows "library" type
-  - Setup.py indicates it's a Python package
+  - setup.py indicates it's a Python package
   - Maven/Gradle config shows artifact type as library
   - No application entry point or server code
   - Primarily exports modules/functions for other projects
