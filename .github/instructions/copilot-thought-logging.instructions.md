@@ -1,9 +1,11 @@
 ---
 applyTo: '**'
-description: 'See process Copilot is following where you can edit this to reshape the interaction or save when follow up may be needed'
+description: 'Copilot thought logging for persistent memory - see the process Copilot is following where you can edit to reshape interaction or save for follow-up. REQUIREMENT: Memory location directory must exist before initialization (Windows: $env:USERPROFILE/devDrive, Linux/macOS: $HOME/.copilot-memory).'
 ---
 
-# Copilot Process tracking Instructions
+# Copilot Thought Logging Instructions
+
+> **Purpose**: Maintain persistent Copilot memory across all projects through structured thought logging
 
 **ABSOLUTE MANDATORY RULES:**
 - You must review these instructions in full before executing any steps to understand the full instructions guidelines.
@@ -18,18 +20,35 @@ description: 'See process Copilot is following where you can edit this to reshap
 
 # Phase 1: Initialization
 
-- Check if `/.copilot-logs` symlink exists in workspace root
-- If symlink does not exist, create it pointing to `../copilot-logs` (one level up from workspace root)
-- Ensure the target directory `../copilot-logs` exists (create if needed)
-- Determine the current log file name: `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md` using today's date
-- If the current log file does not exist, create it
-- If the current log file exists and exceeds 1MB in size, rotate it by renaming to `/.copilot-logs/Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md` (using hours, minutes, seconds, and milliseconds) and create a new file
-- Append to the current log file with timestamp and session details including:
-  - Timestamp in ISO 8601 format
-  - Project/repository name
-  - Workspace path
-  - Current branch (if git repository)
-  - User request details
+- Check if `.github/copilot-config.yml` exists (path relative to workspace root)
+- If config file doesn't exist, create it with complete default configuration:
+  - `logging.memory_file_pattern`: "Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md"
+  - `logging.memory_location`: "$env:USERPROFILE/devDrive/copilot-global-memory" (Windows) or "$HOME/.copilot-global-memory" (Linux/macOS)
+  - `logging.memory_symlink_name`: ".github/.copilot-memory"
+  - `session_metadata.include_timestamp`: true
+  - `session_metadata.include_project_name`: true
+  - `session_metadata.include_workspace_path`: true
+  - `session_metadata.include_branch`: true
+  - `session_metadata.include_user_request`: true
+- If config file exists, read configuration from `.github/copilot-config.yml` to get all logging and session_metadata settings
+- For any missing configuration entries in existing config, add them with their default values listed above
+- Note: The config file is the single source of truth once it exists, but the instructions define the initial defaults
+- Resolve the `logging.memory_location` path (expand environment variables based on shell: `$env:USERPROFILE`, `%USERPROFILE%`, `$HOME`, or `${HOME}`)
+- Ensure the memory location folder exists at the resolved path (create if needed, including parent directories)
+- Ensure the thought-logs subdirectory exists at `{resolved_memory_location}/thought-logs` (create if needed)
+- Check if symlink exists at the path specified in config: `logging.memory_symlink_name` (relative to workspace root)
+- If symlink does not exist, create it at `logging.memory_symlink_name` pointing to the resolved `logging.memory_location` path
+- Check if the root `.gitignore` file in the workspace contains an entry for the memory symlink path (from config: `logging.memory_symlink_name`)
+- If not present, append the memory symlink path to the root `.gitignore` file with a comment explaining it's for Copilot memory (e.g., "# Copilot memory symlink; global memory folder can be tracked separately if desired")
+- Determine the current memory file name using config: `logging.memory_file_pattern`, substituting today's date (YYYY-MM-DD format) and current timestamp (HHmmssSSS format)
+- The memory file path is: `{logging.memory_symlink_name}/thought-logs/{computed_filename}`
+- Create the memory file at the computed path (each session gets a unique timestamped file)
+- Append to the current log file with session details based on config: `session_metadata` settings:
+  - Timestamp in ISO 8601 format (if config: `session_metadata.include_timestamp` is true)
+  - Project/repository name (if config: `session_metadata.include_project_name` is true)
+  - Workspace path (if config: `session_metadata.include_workspace_path` is true)
+  - Current branch (if config: `session_metadata.include_branch` is true and git repository exists)
+  - User request details (if config: `session_metadata.include_user_request` is true)
 - Add a separator line (e.g., `---`) between entries for readability
 - Work silently without announcements until complete.
 - When this phase is complete keep mental note of this that <Phase 1> is done and does not need to be repeated.
@@ -56,12 +75,18 @@ description: 'See process Copilot is following where you can edit this to reshap
 
 # Phase 4: Summary
 
-- Add summary to the current log file `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md`
+- Add summary to the current log file at path: `{logging.memory_symlink_name}/thought-logs/{computed_filename}`
 - Work silently without announcements until complete.
 - Execute only when ALL actions complete
-- Inform user: "Added final summary to `/.copilot-logs/Copilot-Processing-YYYY-MM-DD.md`."
-- Remind user that `.copilot-logs` symlink should be added to `.gitignore` if not already present.
-- Inform user that the parent-level `copilot-logs` directory can be maintained as a separate git repository for global memory across all projects.
+- Inform user: "Added final summary to `{logging.memory_symlink_name}/thought-logs/{computed_filename}`."
+- Remind user that the symlink (from config: `logging.memory_symlink_name`) should be added to `.gitignore` if not already present.
+- Inform user that the memory location folder (from config: `logging.memory_location`) serves as Copilot's persistent memory system and can be maintained as a separate git repository for global memory across all projects.
+- If the symlink or memory location folder was created during initialization, remind user to:
+  - Verify the symlink path (from config: `logging.memory_symlink_name`) is in `.gitignore` to exclude the memory symlink from version control
+  - Initialize the memory location folder (from config: `logging.memory_location`) as a git repository if desired for version control
+  - Set up automated log scrubbing/sanitization processes to remove sensitive information
+  - Configure log retention policies and backup strategies
+  - Review and sanitize logs regularly before committing to any repository
 - **Warning:** Logs may contain sensitive or confidential information. Always review and sanitize logs before committing them to any repository.
 
 **ENFORCEMENT RULES:**

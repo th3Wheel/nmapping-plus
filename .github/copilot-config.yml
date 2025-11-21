@@ -1,0 +1,33 @@
+---
+# Copilot Configuration
+# This file contains settings for GitHub Copilot behavior in this repository
+
+logging:
+  # Processing memory file naming pattern (YYYY-MM-DD will be substituted with current date)
+  # Example: Copilot-Processing-2024-01-15.md
+  # YYYY-MM-DD will be replaced with date, HHmmssSSS with timestamp
+  # Each session creates a unique file - no rotation needed
+  memory_file_pattern: "Copilot-Processing-YYYY-MM-DD-HHmmssSSS.md"
+  
+  # Global memory base directory (symlink target)
+  # Can be relative (e.g., "../copilot-global-memory") or absolute
+  # Environment variables will be expanded based on the shell:
+  #   Windows (PowerShell): $env:USERPROFILE or %USERPROFILE%
+  #   Linux/macOS (bash/zsh): $HOME or ${HOME}
+  # Examples:
+  #   Windows: "$env:USERPROFILE/devDrive/copilot-global-memory"
+  #   Linux/macOS: "$HOME/.copilot-global-memory"
+  #   Cross-platform: "../copilot-global-memory"
+  memory_location: "~/.copilot-global-memory"
+  
+  # Memory symlink path (relative to workspace root)
+  # Thought logs will be stored at: {memory_symlink_name}/thought-logs
+  memory_symlink_name: ".github/.copilot-memory"
+
+session_metadata:
+  # Include these fields in log entries
+  include_timestamp: true
+  include_project_name: true
+  include_workspace_path: true
+  include_branch: true
+  include_user_request: true
